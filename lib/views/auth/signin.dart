@@ -128,7 +128,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Go.named(context,MyRouter.otp);
+                      // Go.named(context,MyRouter.otp);
+                          context.go('/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
@@ -213,7 +214,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Go.namedReplace(context,MyRouter.home);
+                          Go.namedReplace(context,MyRouter.studentDash);
                         },
                         child: const Text(
                           "Skip",

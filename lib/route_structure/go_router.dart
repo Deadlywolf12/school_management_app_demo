@@ -4,6 +4,7 @@ import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
+import 'package:school_management_demo/views/home/student_dashboard.dart';
 
 import 'package:school_management_demo/views/landing/landing_screen.dart';
 import 'package:school_management_demo/views/navbar/navbar.dart';
@@ -28,7 +29,7 @@ class MyRouter {
   static const String about = 'about';
   static const String faqs = 'faqs';
   static const String remainder = 'remainder';
-  static const String cat = 'cat';
+  static const String studentDash = 'studentDash';
 
   static const String storage = 'storage';
   static const String loanDashboard = 'loanDashboard';
@@ -76,6 +77,12 @@ class MyRouter {
         builder: (context, state) => const ProfileScreen(),
       ),
      
+          GoRoute(
+        path: '/$studentDash',
+        name: studentDash,
+        builder: (context, state) => const StudentHomeScreen(),
+      ),
+     
     
      
 //      GoRoute(
@@ -92,7 +99,7 @@ class MyRouter {
 
    GoRoute(
       path: '/home',
-      builder: (context, state) => const NavigationHandler(),
+      builder: (context, state) => const NavigationHandler(userRole: 'staff',),
     ),
    
 
