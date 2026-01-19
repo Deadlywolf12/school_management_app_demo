@@ -4,9 +4,10 @@ import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
-import 'package:school_management_demo/views/auth/signup.dart';
+
 import 'package:school_management_demo/views/landing/landing_screen.dart';
 import 'package:school_management_demo/views/navbar/navbar.dart';
+import 'package:school_management_demo/views/profile/profile.dart';
 import 'package:school_management_demo/views/splash/splash.dart';
 
 
@@ -53,11 +54,7 @@ class MyRouter {
         name: signin,
         builder: (context, state) => const SignInScreen(),
       ),
-      GoRoute(
-        path: '/$signup',
-        name: signup,
-        builder: (context, state) => const SignUpScreen(),
-      ),
+    
       GoRoute(
         path: '/$otp',
         name: otp,
@@ -72,6 +69,11 @@ class MyRouter {
         path: '/$newPass',
         name: newPass,
         builder: (context, state) => const SetNewPasswordScreen(),
+      ),
+          GoRoute(
+        path: '/$profile',
+        name: profile,
+        builder: (context, state) => const ProfileScreen(),
       ),
      
     

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_demo/helper/alert_dialog.dart';
 import 'package:school_management_demo/route_structure/go_navigator.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
@@ -18,6 +19,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+    bool _isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 8.kH,
                 const Text(
-                  "Log in to manage your expenses",
+                  "Login to your LMS Account",
                   style: TextStyle(fontSize: 16, color: AppTheme.grey),
                 ),
                 30.kH,
@@ -86,23 +88,48 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 10.kH,
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Go.named(context, MyRouter.forgotPass);
-                    },
-                    child: const Text(
-                      "Forgot password?",
-                      style: TextStyle(color: AppTheme.primaryColor),
-                    ),
-                  ),
-                ),
+            Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    
+    Row(
+      children: [
+        Checkbox(
+          value: _isChecked,
+          activeColor: AppTheme.primaryColor,
+          onChanged: (value) {
+            setState(() {
+              _isChecked = value!;
+            });
+          },
+        ),
+        const Text(
+          "Remember me",
+          style: TextStyle(color: AppTheme.grey),
+        ),
+      ],
+    ),
+    TextButton(
+      onPressed: () {
+        Go.named(context, MyRouter.forgotPass);
+      },
+      child: const Text(
+        "Forgot password?",
+        style: TextStyle(color: AppTheme.primaryColor),
+      ),
+    ),
+
+   
+  ],
+),
+
                 10.kH,
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Go.named(context,MyRouter.otp);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 15),
@@ -155,7 +182,11 @@ class _SignInScreenState extends State<SignInScreen> {
                           ],
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(context: context, builder: (BuildContext context){
+                              return CustomAlertDialog(onTapOk: (){Go.pop(context);},title: "Feature not available yet",subTitle: "This feature is not yet available, coming soon!",okBtnTitle: "Close",);
+                            });
+                          },
                           icon: const Icon(
                             LucideIcons.fingerprint,
                             color: AppTheme.primaryColor,
@@ -182,10 +213,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Go.namedReplace(context,MyRouter.signup);
+                          Go.namedReplace(context,MyRouter.home);
                         },
                         child: const Text(
-                          "Sign Up",
+                          "Skip",
                           style: TextStyle(
                             color: AppTheme.primaryColor,
                             fontWeight: FontWeight.bold,

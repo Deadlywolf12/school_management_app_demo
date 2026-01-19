@@ -5,7 +5,7 @@ class AppTheme {
   static const Color primaryColor = Color(0xFF77CED9); // main accent
   static const Color primaryColor2 = Color(0xFFFFD700); // secondary accent
   static const Color backgroundLight = Color(0xFFF9FAFB);
-  static const Color backgroundDark = Color(0xFF001540);
+  static const Color backgroundDark = Color.fromARGB(255, 0, 11, 32);
   static const Color cardColor = Color(0xFF1E293B);
   static const Color textPrimary = Colors.white;
   static const Color textSecondary = Color(0xFFA1A1AA);
@@ -40,7 +40,7 @@ class AppTheme {
         primarySwatch: primarySwatch,
         primaryColor: primaryColor,
         scaffoldBackgroundColor: backgroundLight,
-        cardColor: backgroundLight,
+        cardColor: const Color.fromARGB(255, 245, 245, 246),
         appBarTheme: const AppBarTheme(
           backgroundColor: backgroundLight,
           foregroundColor: primaryColor,

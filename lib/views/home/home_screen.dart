@@ -5,8 +5,7 @@ import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:school_management_demo/widgets/custom_button.dart';
-import 'package:school_management_demo/widgets/custom_text_field.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+
 import 'package:school_management_demo/widgets/filled_box.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -28,16 +27,16 @@ class HomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Good Morning,",
+                        "Hello, Ali",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        "Ali!",
+                        "Admin",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppTheme.primaryColor,
                         ),

@@ -30,7 +30,7 @@ class LandingScreen extends StatelessWidget {
 
               // Title
               const Text(
-                "Track your money,\ncontrol your future.  ",
+                "Track your child\nSimplify school life",
                 style: TextStyle(
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class LandingScreen extends StatelessWidget {
 
               // Subtitle
               const Text(
-                "A simple way to manage your expenses",
+                "Manage classes, track progress, and stay connected — all in one place.",
                 style: TextStyle(fontSize: 18, color: AppTheme.grey),
                 textAlign: TextAlign.center,
               ),
@@ -52,13 +52,13 @@ class LandingScreen extends StatelessWidget {
 
               CustomButton(
                 height: 60,
-                onTap: () { Go.named(context,MyRouter.signup);
+                onTap: () { Go.named(context,MyRouter.signin);
 
                 },
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 child: Text(
 
-                  "Sign Up",
+                  "Sign In",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color:AppTheme.white),
                 ),
               ),
@@ -73,7 +73,7 @@ class LandingScreen extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 buttoncolor: AppTheme.cardColor,
                 child: Text(
-                  "Sign in",
+                  "Skip",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: AppTheme.primaryColor),
                 ),
               ),
