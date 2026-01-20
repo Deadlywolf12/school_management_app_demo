@@ -9,8 +9,7 @@ class Api {
   String base = "http://192.168.100.8:2000/api/v1";
   String profileBase = "http://192.168.100.8:2000/public/";
   static User user = User();
-  static Common common = Common();
-  static Seller seller = Seller();
+
 }
 
 class User {
@@ -36,33 +35,33 @@ class User {
   String getUserNotification = "${api.base}/user/notification";
 }
 
-class Seller {
-  static Api api = Api();
-  String signup = "${api.base}/seller/auth/signup";
-  String login = "${api.base}/seller/auth/signin";
-  String verify = "${api.base}/seller/auth/verify";
-  String resend = "${api.base}/seller/auth/resend";
-  String forgot = "${api.base}/seller/auth/forgot";
-  String updatePassword = "${api.base}/seller/auth/password";
-  String updateProfile = "${api.base}/seller/profile";
-  String sellerChangePass = "${api.base}/seller/profile/password";
-  String fcmNotification = "${api.base}/seller/profile/fcm";
-  String getprofile = "${api.base}/seller/profile";
-  String sellerproperty = "${api.base}/seller/property";
-  String getProperty = "${api.base}/seller/property";
-  String getSellerhome = "${api.base}/seller/home";
-  String getSellerBooking = "${api.base}/seller/property/booking";
-  String getSellerBookingStatus = "${api.base}/seller/property/booking/status";
-  String getSellerNotification = "${api.base}/seller/notification";
-}
+// class Seller {
+//   static Api api = Api();
+//   String signup = "${api.base}/seller/auth/signup";
+//   String login = "${api.base}/seller/auth/signin";
+//   String verify = "${api.base}/seller/auth/verify";
+//   String resend = "${api.base}/seller/auth/resend";
+//   String forgot = "${api.base}/seller/auth/forgot";
+//   String updatePassword = "${api.base}/seller/auth/password";
+//   String updateProfile = "${api.base}/seller/profile";
+//   String sellerChangePass = "${api.base}/seller/profile/password";
+//   String fcmNotification = "${api.base}/seller/profile/fcm";
+//   String getprofile = "${api.base}/seller/profile";
+//   String sellerproperty = "${api.base}/seller/property";
+//   String getProperty = "${api.base}/seller/property";
+//   String getSellerhome = "${api.base}/seller/home";
+//   String getSellerBooking = "${api.base}/seller/property/booking";
+//   String getSellerBookingStatus = "${api.base}/seller/property/booking/status";
+//   String getSellerNotification = "${api.base}/seller/notification";
+// }
 
-class Common {
-  static Api api = Api();
+// class Common {
+//   static Api api = Api();
 
-  String state = "${api.base}/common?state=true";
-  String city = "${api.base}/common?city=true";
-  String type = "${api.base}/common?type=true";
-  String subtype = "${api.base}/common?subType=true";
-  String amenity = "${api.base}/common?amenity=true";
-  String unit = "${api.base}/common?unit=true";
-}
+//   String state = "${api.base}/common?state=true";
+//   String city = "${api.base}/common?city=true";
+//   String type = "${api.base}/common?type=true";
+//   String subtype = "${api.base}/common?subType=true";
+//   String amenity = "${api.base}/common?amenity=true";
+//   String unit = "${api.base}/common?unit=true";
+// }

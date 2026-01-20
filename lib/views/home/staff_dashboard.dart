@@ -19,6 +19,7 @@ class StaffHomeScreen extends StatefulWidget {
 class _StaffHomeScreenState extends State<StaffHomeScreen> {
   late Timer _timer;
   String _currentTime = '';
+  String _shiftEndsIn = '';
   List<Map<String, dynamic>> _tasks = [
     {'title': 'Check and clean all classrooms', 'completed': true},
     {'title': 'Prepare lunch menu for students', 'completed': true},
@@ -45,6 +46,25 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
   void _updateTime() {
     setState(() {
       _currentTime = DateFormat('HH:mm:ss').format(DateTime.now());
+      
+      // Calculate time until shift ends (assuming shift ends at 5 PM / 17:00)
+      final now = DateTime.now();
+      final shiftEnd = DateTime(now.year, now.month, now.day, 17, 0); // 5 PM
+      
+      Duration difference;
+      if (now.isBefore(shiftEnd)) {
+        difference = shiftEnd.difference(now);
+      } else {
+        // If current time is past shift end, show next day's shift
+        final nextShiftEnd = shiftEnd.add(const Duration(days: 1));
+        difference = nextShiftEnd.difference(now);
+      }
+      
+      final hours = difference.inHours;
+      final minutes = difference.inMinutes.remainder(60);
+      final seconds = difference.inSeconds.remainder(60);
+      
+      _shiftEndsIn = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     });
   }
 
@@ -172,60 +192,47 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                         color: AppTheme.grey,
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              20.kH,
-
-              // ⏰ Shift End Timer Card
-              FilledBox(
-                color: AppTheme.primaryColor,
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                child: Row(
-                  children: [
+                    20.kH,
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: AppTheme.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Icon(
-                        LucideIcons.timerReset,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-                    20.kW,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          Icon(
+                            LucideIcons.timerReset,
+                            color: AppTheme.primaryColor,
+                            size: 20,
+                          ),
+                          10.kW,
                           Text(
-                            "Shift Ends In",
+                            "Shift ends in ",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Theme.of(context).disabledColor,
                             ),
                           ),
-                          8.kH,
                           Text(
-                            "09:00",
+                            _shiftEndsIn,
                             style: TextStyle(
-                              fontSize: 36,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppTheme.primaryColor,
                               letterSpacing: 1,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Icon(
-                      LucideIcons.chevronRight,
-                      color: Colors.white.withOpacity(0.7),
-                      size: 24,
                     ),
                   ],
                 ),
@@ -239,12 +246,12 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   Expanded(
                     child: _buildActionCard(
                       context,
-                      icon: LucideIcons.banknote,
-                      title: "Add\nSalary",
-                      color: Colors.green,
+                      icon: LucideIcons.clipboardCheck,
+                      title: "Mark\nAttendance",
+                      color: Colors.blue,
                       onTap: () {
-                        // Navigate to add salary
-                        // Go.named(context, MyRouter.addSalary);
+                        // Navigate to attendance
+                        // Go.named(context, MyRouter.attendance);
                       },
                     ),
                   ),
@@ -252,12 +259,12 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   Expanded(
                     child: _buildActionCard(
                       context,
-                      icon: LucideIcons.clipboardCheck,
-                      title: "Mark\nAttendance",
-                      color: Colors.blue,
+                      icon: LucideIcons.listChecks,
+                      title: "View\nTasks",
+                      color: Colors.orange,
                       onTap: () {
-                        // Navigate to attendance
-                        // Go.named(context, MyRouter.attendance);
+                        // Navigate to tasks
+                        // Go.named(context, MyRouter.tasks);
                       },
                     ),
                   ),
@@ -271,12 +278,12 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   Expanded(
                     child: _buildActionCard(
                       context,
-                      icon: LucideIcons.listChecks,
-                      title: "View\nTasks",
-                      color: Colors.orange,
+                      icon: LucideIcons.alertCircle,
+                      title: "Report\nIssue",
+                      color: Colors.red,
                       onTap: () {
-                        // Navigate to tasks
-                        // Go.named(context, MyRouter.tasks);
+                        // Navigate to report issue
+                        // Go.named(context, MyRouter.reportIssue);
                       },
                     ),
                   ),
@@ -284,12 +291,12 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   Expanded(
                     child: _buildActionCard(
                       context,
-                      icon: LucideIcons.alertCircle,
-                      title: "Report\nIssue",
-                      color: Colors.red,
+                      icon: LucideIcons.banknote,
+                      title: "Add\nSalary",
+                      color: Colors.green,
                       onTap: () {
-                        // Navigate to report issue
-                        // Go.named(context, MyRouter.reportIssue);
+                        // Navigate to add salary
+                        // Go.named(context, MyRouter.addSalary);
                       },
                     ),
                   ),

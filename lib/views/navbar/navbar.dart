@@ -94,6 +94,7 @@ class _NavigationHandlerState extends State<NavigationHandler> {
       case "student":
         return const [
           _NavItem(LucideIcons.home, "Home"),
+          _NavItem(LucideIcons.bookOpen, "schedule"),
           _NavItem(LucideIcons.settings2, "Settings"),
         ];
       case "staff":

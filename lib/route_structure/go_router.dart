@@ -99,7 +99,7 @@ class MyRouter {
 
    GoRoute(
       path: '/home',
-      builder: (context, state) => const NavigationHandler(userRole: 'staff',),
+      builder: (context, state) => const NavigationHandler(userRole: 'student',),
     ),
    
 

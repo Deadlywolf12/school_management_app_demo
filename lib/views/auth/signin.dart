@@ -129,7 +129,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Go.named(context,MyRouter.otp);
-                          context.go('/home');
+                          // context.go('/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
