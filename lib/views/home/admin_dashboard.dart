@@ -130,7 +130,7 @@ class AdminHomeScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Navigate to teachers screen
-                        // Go.named(context, MyRouter.teachers);
+                        Go.named(context, MyRouter.teachers);
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,

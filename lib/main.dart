@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:responsive_framework/utils/scroll_behavior.dart';
+import 'package:school_management_demo/provider/auth_pro.dart';
+import 'package:school_management_demo/provider/employee_pro.dart';
 import 'package:school_management_demo/provider/theme_pro.dart';
+import 'package:school_management_demo/provider/user_registration_provider.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
 
@@ -18,8 +21,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // ChangeNotifierProvider<AuthPro>(create: (_) => AuthPro()),
+        ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
         ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
+        ChangeNotifierProvider<FacultyProvider>(create: (_) => FacultyProvider()),
+        ChangeNotifierProvider<UserRegistrationProvider>(create: (_) => UserRegistrationProvider()),
       ],
       child: MyApp(),
     ),

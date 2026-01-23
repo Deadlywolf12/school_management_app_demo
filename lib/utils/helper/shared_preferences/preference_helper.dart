@@ -104,4 +104,43 @@ class SharedPrefHelper {
 
   dynamic getDynamic(String key, {Object? defValue}) =>
       _prefs?.get(key) ?? defValue;
+
+      
+      // ───────────────────────────────
+// AUTH HELPERS
+// ───────────────────────────────
+
+static const String _tokenKey = 'auth_token';
+static const String _roleKey = 'user_role';
+
+Future<void> saveToken(String token) async {
+  await putString(_tokenKey, token);
+}
+
+String getToken() {
+  return getString(_tokenKey);
+}
+
+Future<void> removeToken() async {
+  await remove(_tokenKey);
+}
+
+bool hasToken() {
+  return containsKey(_tokenKey) && getToken().isNotEmpty;
+}
+
+// ---- ROLE ----
+
+Future<void> saveRole(String role) async {
+  await putString(_roleKey, role);
+}
+
+String getRole() {
+  return getString(_roleKey);
+}
+
+Future<void> removeRole() async {
+  await remove(_roleKey);
+}
+
 }

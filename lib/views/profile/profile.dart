@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:school_management_demo/provider/auth_pro.dart';
 import 'package:school_management_demo/route_structure/go_navigator.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
@@ -342,48 +344,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Logout',
-          style: TextStyle(
-            color: AppTheme.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to logout?',
-          style: TextStyle(color: AppTheme.grey),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppTheme.grey),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Perform logout logic here
-              // Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: Text(
-              'Logout',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
+void _showLogoutDialog() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: AppTheme.cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-    );
-  }
+      title: Text(
+        'Logout',
+        style: TextStyle(
+          color: AppTheme.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      content: Text(
+        'Are you sure you want to logout?',
+        style: TextStyle(color: AppTheme.grey),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: AppTheme.grey),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // close the dialog first
+
+            // Call logout from AuthProvider
+            Provider.of<AuthProvider>(context, listen: false)
+                .logout(context);
+          },
+          child: Text(
+            'Logout',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 }

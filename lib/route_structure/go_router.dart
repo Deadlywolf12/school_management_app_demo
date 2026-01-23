@@ -1,9 +1,14 @@
 
 import 'package:go_router/go_router.dart';
+import 'package:school_management_demo/models/emp_model.dart';
+
 import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
+import 'package:school_management_demo/views/employees/employee_create.dart';
+import 'package:school_management_demo/views/employees/employees_list.dart';
+import 'package:school_management_demo/views/employees/teacher_details.dart';
 import 'package:school_management_demo/views/home/student_dashboard.dart';
 
 import 'package:school_management_demo/views/landing/landing_screen.dart';
@@ -30,6 +35,9 @@ class MyRouter {
   static const String faqs = 'faqs';
   static const String remainder = 'remainder';
   static const String studentDash = 'studentDash';
+  static const String teachers = 'teachers';
+  static const String teacherDetails = 'teacherDetails';
+  static const String createUser = 'createUser';
 
   static const String storage = 'storage';
   static const String loanDashboard = 'loanDashboard';
@@ -83,7 +91,27 @@ class MyRouter {
         builder: (context, state) => const StudentHomeScreen(),
       ),
      
-    
+      GoRoute(
+        path: '/$teachers',
+        name: teachers,
+        builder: (context, state) => const FacultyDirectoryScreen(),
+      ),
+        GoRoute(
+        path: '/$createUser',
+        name: createUser,
+        builder: (context, state) => const UserCreationScreen(),
+      ),
+        GoRoute(
+        path: '/$teacherDetails',
+        name: teacherDetails,
+        
+        builder: (context, state) {
+    final teacher = state.extra as EmpUser;
+    return TeacherDetailScreen(user: teacher);
+  },
+      ),
+     
+     
      
 //      GoRoute(
 // path: '/$loanDashboard/:userName/:totalToTake/:totalToGive',
@@ -97,11 +125,14 @@ class MyRouter {
 //   },
 // ),
 
-   GoRoute(
-      path: '/home',
-      builder: (context, state) => const NavigationHandler(userRole: 'student',),
-    ),
-   
+GoRoute(
+  path: '/home',
+  builder: (context, state) {
+    final role = state.extra as String;
+    return NavigationHandler(userRole: role);
+  },
+),
+
 
    
 
