@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management_demo/models/emp_model.dart';
-import 'package:school_management_demo/models/user_model.dart' hide User;
-
 import 'package:school_management_demo/provider/employee_pro.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,24 +65,33 @@ class TeacherDetailScreen extends StatelessWidget {
     if (user is Staff) return 'Staff';
     if (user is Student) return 'Student';
     if (user is Parent) return 'Parent';
+    if (user.role == 'admin') return 'Admin';
     return 'User';
   }
 
   Widget _buildHeader() {
     String subtitle = '';
+    IconData avatarIcon = Icons.person;
     
     if (user is Teacher) {
       final teacher = user as Teacher;
       subtitle = '${teacher.department} • ${teacher.subject}';
+      avatarIcon = Icons.school;
     } else if (user is Staff) {
       final staff = user as Staff;
       subtitle = '${staff.department} • ${staff.roleDetails}';
+      avatarIcon = Icons.work;
     } else if (user is Student) {
       final student = user as Student;
       subtitle = 'Class ${student.classLevel} • ${student.studentId}';
+      avatarIcon = Icons.person;
     } else if (user is Parent) {
       final parent = user as Parent;
       subtitle = 'Guardian • ${parent.phoneNumber}';
+      avatarIcon = Icons.family_restroom;
+    } else if (user.role == 'admin') {
+      subtitle = 'Administrator';
+      avatarIcon = Icons.shield;
     }
 
     return Container(
@@ -108,17 +115,17 @@ class TeacherDetailScreen extends StatelessWidget {
               color: Colors.white,
               border: Border.all(color: Colors.white, width: 4),
             ),
-            child: const Icon(
-              Icons.person,
+            child: Icon(
+              avatarIcon,
               size: 60,
               color: primaryColor,
             ),
           ),
           const SizedBox(height: 16),
           
-          // Name
+          // Name or Email
           Text(
-            user.name,
+            user.name.isNotEmpty ? user.name : user.email,
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -159,8 +166,117 @@ class TeacherDetailScreen extends StatelessWidget {
       return _buildStudentSections(context, user as Student);
     } else if (user is Parent) {
       return _buildParentSections(context, user as Parent);
+    } else if (user.role == 'admin') {
+      return _buildAdminSections(context);
     }
     return [];
+  }
+
+  List<Widget> _buildAdminSections(BuildContext context) {
+    return [
+      // Admin Details
+      _buildSection(
+        context,
+        title: 'Administrator Details',
+        children: [
+          _buildInfoTile(
+            icon: Icons.badge,
+            label: 'User ID',
+            value: user.id,
+          ),
+          _buildInfoTile(
+            icon: Icons.email,
+            label: 'Email',
+            value: user.email,
+          ),
+          _buildInfoTile(
+            icon: Icons.shield_outlined,
+            label: 'Role',
+            value: 'ADMINISTRATOR',
+            valueColor: primaryColor,
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      
+      // Permissions Info
+      _buildSection(
+        context,
+        title: 'Permissions',
+        children: [
+          _buildPermissionTile(
+            icon: Icons.check_circle,
+            label: 'Full System Access',
+            isGranted: true,
+          ),
+          _buildPermissionTile(
+            icon: Icons.check_circle,
+            label: 'User Management',
+            isGranted: true,
+          ),
+          _buildPermissionTile(
+            icon: Icons.check_circle,
+            label: 'Data Management',
+            isGranted: true,
+          ),
+        ],
+      ),
+    ];
+  }
+
+  Widget _buildPermissionTile({
+    required IconData icon,
+    required String label,
+    required bool isGranted,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isGranted
+                  ? Colors.green.withOpacity(0.1)
+                  : Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: isGranted ? Colors.green : Colors.grey,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isGranted ? AppTheme.white : AppTheme.lightGrey,
+              ),
+            ),
+          ),
+          if (isGranted)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'GRANTED',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   List<Widget> _buildTeacherSections(BuildContext context, Teacher teacher) {

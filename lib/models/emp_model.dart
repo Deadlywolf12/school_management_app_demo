@@ -1,4 +1,3 @@
-
 class EmpUser {
   final String id;
   final String name;
@@ -287,6 +286,8 @@ class FacultyResponse {
           return Student.fromJson(userJson);
         case 'parent':
           return Parent.fromJson(userJson);
+        case 'admin':
+          return EmpUser.fromJson(userJson); // Admin uses base EmpUser
         default:
           return EmpUser.fromJson(userJson);
       }

@@ -175,7 +175,7 @@ class AdminHomeScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Navigate to revenue screen
-                        // Go.named(context, MyRouter.revenue);
+                        Go.named(context, MyRouter.adminlist);
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,

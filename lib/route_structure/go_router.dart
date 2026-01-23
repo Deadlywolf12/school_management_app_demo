@@ -6,6 +6,7 @@ import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
+import 'package:school_management_demo/views/employees/admin_list.dart';
 import 'package:school_management_demo/views/employees/employee_create.dart';
 import 'package:school_management_demo/views/employees/employees_list.dart';
 import 'package:school_management_demo/views/employees/teacher_details.dart';
@@ -38,6 +39,7 @@ class MyRouter {
   static const String teachers = 'teachers';
   static const String teacherDetails = 'teacherDetails';
   static const String createUser = 'createUser';
+  static const String adminlist = 'adminlist';
 
   static const String storage = 'storage';
   static const String loanDashboard = 'loanDashboard';
@@ -100,6 +102,11 @@ class MyRouter {
         path: '/$createUser',
         name: createUser,
         builder: (context, state) => const UserCreationScreen(),
+      ),
+        GoRoute(
+        path: '/$adminlist',
+        name: adminlist,
+        builder: (context, state) => const AdminListScreen(),
       ),
         GoRoute(
         path: '/$teacherDetails',
