@@ -214,7 +214,15 @@ class AdminHomeScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Navigate to attendance screen
-                        // Go.named(context, MyRouter.attendance);
+                    Go.named(
+  context,
+  MyRouter.attendance,
+  extra: {
+    "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
+    "userName": "John Doe",
+    "userRole": "teacher",
+  },
+);
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,

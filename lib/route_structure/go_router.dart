@@ -1,6 +1,7 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:school_management_demo/models/emp_model.dart';
+import 'package:school_management_demo/views/attendence/attendence.dart';
 
 import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
@@ -41,7 +42,7 @@ class MyRouter {
   static const String createUser = 'createUser';
   static const String adminlist = 'adminlist';
 
-  static const String storage = 'storage';
+  static const String attendance = 'attendance';
   static const String loanDashboard = 'loanDashboard';
   static final GoRouter router = GoRouter(
     initialLocation: '/$splash',
@@ -108,6 +109,24 @@ class MyRouter {
         name: adminlist,
         builder: (context, state) => const AdminListScreen(),
       ),
+   GoRoute(
+  path: '/$attendance',
+  name: attendance,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+
+    final userId = extra?["userId"] as String? ?? "";
+    final userName = extra?["userName"] as String? ?? "";
+    final userRole = extra?["userRole"] as String? ?? "";
+
+    return AttendanceMarkingScreen(
+      userId: userId,
+      userName: userName,
+      userRole: userRole,
+    );
+  },
+),
+
         GoRoute(
         path: '/$teacherDetails',
         name: teacherDetails,

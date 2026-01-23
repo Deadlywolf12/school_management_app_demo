@@ -48,9 +48,9 @@ AuthResponse? get authResponse => _authResponse;
     );
 
 if (response['success'] != true) {
-  final errors = response['errors'] as List<dynamic>?; 
+  final errors = response['msg']; 
   _errorMessage = errors != null && errors.isNotEmpty
-      ? errors.join('\n') 
+      ? errors
       : 'Something went wrong';
   _status = AuthStatus.error;
   notifyListeners();

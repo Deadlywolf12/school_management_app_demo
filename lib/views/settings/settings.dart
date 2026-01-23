@@ -236,7 +236,7 @@ isDarkMode = Provider.of<ThemeNotifier>(context,listen: false).isDarkMode;
                   subtitle: 'Manage data storage',
                   value: null,
                   onTap: () {
-                   Go.named(context,MyRouter.storage);
+                  //  Go.named(context,MyRouter.storage);
                   },
                 ),
               ],
