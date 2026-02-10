@@ -1,22 +1,30 @@
 
+
 import 'package:go_router/go_router.dart';
 import 'package:school_management_demo/models/emp_model.dart';
+import 'package:school_management_demo/models/subjects_model.dart';
 import 'package:school_management_demo/views/attendence/attendence.dart';
 
 import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
-import 'package:school_management_demo/views/employees/admin_list.dart';
+
 import 'package:school_management_demo/views/employees/employee_create.dart';
 import 'package:school_management_demo/views/employees/employees_list.dart';
-import 'package:school_management_demo/views/employees/teacher_details.dart';
+import 'package:school_management_demo/views/employees/employees_details.dart';
+import 'package:school_management_demo/views/home/admin/others/quick_buttons.dart';
+
 import 'package:school_management_demo/views/home/student_dashboard.dart';
 
 import 'package:school_management_demo/views/landing/landing_screen.dart';
 import 'package:school_management_demo/views/navbar/navbar.dart';
+import 'package:school_management_demo/views/parent_student/parent_student_manage_screen.dart';
 import 'package:school_management_demo/views/profile/profile.dart';
 import 'package:school_management_demo/views/splash/splash.dart';
+import 'package:school_management_demo/views/subjects/edit_create_subject.dart';
+import 'package:school_management_demo/views/subjects/subject_detail.dart';
+import 'package:school_management_demo/views/subjects/subjects.dart';
 
 
 class MyRouter {
@@ -37,13 +45,18 @@ class MyRouter {
   static const String faqs = 'faqs';
   static const String remainder = 'remainder';
   static const String studentDash = 'studentDash';
-  static const String teachers = 'teachers';
+  static const String faculty = 'faculty';
   static const String teacherDetails = 'teacherDetails';
   static const String createUser = 'createUser';
+  static const String subjects = 'subjects';
+  static const String subjectdetails = 'subjectdetails';
+  static const String subjectEditCreate = 'subjectEditCreate';
   static const String adminlist = 'adminlist';
+  static const String parent_student = 'parent_student';
 
   static const String attendance = 'attendance';
   static const String loanDashboard = 'loanDashboard';
+  static const String QuickButtons = 'QuickButtons';
   static final GoRouter router = GoRouter(
     initialLocation: '/$splash',
 
@@ -95,9 +108,12 @@ class MyRouter {
       ),
      
       GoRoute(
-        path: '/$teachers',
-        name: teachers,
-        builder: (context, state) => const FacultyDirectoryScreen(),
+        path: '/$faculty',
+        name: faculty,
+        builder: (context, state) {
+          final role = state.extra as String?;
+          return FacultyDirectoryScreen(role: role);
+        },
       ),
         GoRoute(
         path: '/$createUser',
@@ -105,10 +121,17 @@ class MyRouter {
         builder: (context, state) => const UserCreationScreen(),
       ),
         GoRoute(
-        path: '/$adminlist',
-        name: adminlist,
-        builder: (context, state) => const AdminListScreen(),
+        path: '/$subjects',
+        name: subjects,
+        builder: (context, state) => const SubjectsScreen(),
       ),
+      //  
+          GoRoute(
+          path: '/$QuickButtons',
+          name: QuickButtons,
+          builder: (context, state) => const EditQuickButtons(),
+        ),
+
    GoRoute(
   path: '/$attendance',
   name: attendance,
@@ -126,14 +149,60 @@ class MyRouter {
     );
   },
 ),
+ GoRoute(
+  path: '/$parent_student',
+  name: parent_student,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
 
+    final userId = extra?["userId"] as String? ?? "";
+    final userName = extra?["userName"] as String? ?? "";
+    final userRole = extra?["userRole"] as String? ?? "";
+
+    return ManageParentStudentScreen(
+      userId: userId,
+      userName: userName,
+      userRole: userRole,
+    );
+  },
+),
+ GoRoute(
+  path: '/$subjectEditCreate',
+  name: subjectEditCreate,
+  builder: (context, state) {
+  final extra = state.extra as Map<String, dynamic>?;
+
+final subject = extra?["subject"] as Subject?;
+
+  
+    return SubjectEditScreen(
+       subject: subject,
+   
+    );
+  },
+),
+
+GoRoute(
+  path: '/$subjectdetails',
+  name: subjectdetails,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+
+    final subjectId = extra?["subjectId"] as String? ?? "";
+  
+    return SubjectDetailScreen(
+       subjectId: subjectId,
+   
+    );
+  },
+),
         GoRoute(
         path: '/$teacherDetails',
         name: teacherDetails,
         
         builder: (context, state) {
     final teacher = state.extra as EmpUser;
-    return TeacherDetailScreen(user: teacher);
+    return EmployeesDetailScreen(user: teacher);
   },
       ),
      
@@ -152,16 +221,17 @@ class MyRouter {
 // ),
 
 GoRoute(
-  path: '/home',
+  path: '/$home',
+  name: home,  // Added missing name
   builder: (context, state) {
-    final role = state.extra as String;
+    final role = state.extra as String? ?? 'guest';  
     return NavigationHandler(userRole: role);
   },
 ),
-
 
    
 
     ],
   );
+
 }

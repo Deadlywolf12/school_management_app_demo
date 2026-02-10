@@ -1,34 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:school_management_demo/models/emp_model.dart';
-import 'package:school_management_demo/provider/employee_pro.dart';
+
+import 'package:school_management_demo/models/subjects_model.dart';
+
+
+import 'package:school_management_demo/provider/subjects_pro.dart';
 import 'package:school_management_demo/route_structure/go_navigator.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class AdminListScreen extends StatefulWidget {
-  const AdminListScreen({Key? key}) : super(key: key);
+
+class SubjectsScreen extends StatefulWidget {
+  
+  const SubjectsScreen({Key? key}) : super(key: key);
 
   @override
-  State<AdminListScreen> createState() => _AdminListScreenState();
+  State<SubjectsScreen> createState() => _SubjectsScreenState();
 }
 
-class _AdminListScreenState extends State<AdminListScreen> {
+class _SubjectsScreenState extends State<SubjectsScreen> {
+
   final TextEditingController _searchController = TextEditingController();
+ 
+
+  String _sortBy = 'Name';
+  
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Fetch admins on init
+
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchData();
     });
-
-    // Setup infinite scroll
-    _scrollController.addListener(_onScroll);
+    
+   
+   
   }
 
   @override
@@ -39,37 +50,95 @@ class _AdminListScreenState extends State<AdminListScreen> {
   }
 
   void _fetchData() {
-    final provider = context.read<FacultyProvider>();
-    provider.fetchFaculty(role: 'admin',context: context);
+    final provider = context.read<SubjectsProvider>();
+    provider.fetchSubjects(context: context);
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      final provider = context.read<FacultyProvider>();
-      if (provider.hasMore && !provider.isLoadingMore) {
-        provider.loadMore(context);
-      }
-    }
-  }
+  // void _onScroll() {
+  //   if (_scrollController.position.pixels >=
+  //       _scrollController.position.maxScrollExtent - 200) {
+  //     final provider = context.read<FacultyProvider>();
+  //     if (provider.hasMore && !provider.isLoadingMore) {
+  //       provider.loadMore(context);
+  //     }
+  //   }
+  // }
 
-  List<EmpUser> _getFilteredList(FacultyProvider provider) {
-    List<EmpUser> list = provider.facultyList;
+  List<Subject> _getFilteredList(SubjectsProvider provider) {
+    List<Subject> list = provider.getListOfSubjects ?? [];
 
     // Apply search filter
     if (_searchController.text.isNotEmpty) {
       list = provider.search(_searchController.text);
     }
 
-    // Sort by email
-    list.sort((a, b) => a.email.compareTo(b.email));
+  
+    // Apply sorting
+    if (_sortBy == 'Name') {
+      list = provider.sortByName(list);
+    } 
 
     return list;
   }
 
+ 
+
+
+  // void _showSortOptions() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (context) => Container(
+  //       padding: const EdgeInsets.all(20),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text(
+  //             'Sort By',
+  //             style: TextStyle(
+  //               fontSize: 20,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           20.kH,
+  //           ListTile(
+  //             leading: Icon(
+  //               _sortBy == 'Name'
+  //                   ? Icons.radio_button_checked
+  //                   : Icons.radio_button_off,
+  //               color: AppTheme.primaryColor,
+  //             ),
+  //             title: const Text('Name'),
+  //             onTap: () {
+  //               setState(() => _sortBy = 'Name');
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //           ListTile(
+  //             leading: Icon(
+  //               _sortBy == 'Department'
+  //                   ? Icons.radio_button_checked
+  //                   : Icons.radio_button_off,
+  //               color: AppTheme.primaryColor,
+  //             ),
+  //             title: const Text('Department'),
+  //             onTap: () {
+  //               setState(() => _sortBy = 'Department');
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<FacultyProvider>(
+    return Consumer<SubjectsProvider>(
       builder: (context, provider, child) {
         final filteredList = _getFilteredList(provider);
 
@@ -79,23 +148,20 @@ class _AdminListScreenState extends State<AdminListScreen> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text('Admins'),
+            title: const Text('Faculty Directory'),
             centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  LucideIcons.userPlus,
-                  color: AppTheme.primaryColor,
-                ),
-                onPressed: () {
-                  // Navigate to create admin screen
-                  // Go.named(context, MyRouter.createUser, extra: 'admin');
-                },
-              ),
-            ],
+            // actions: [
+            //   IconButton(
+            //     icon: Icon(
+            //       _getRoleIcon(),
+            //       color: AppTheme.primaryColor,
+            //     ),
+            //     onPressed: _showRoleSelector,
+            //   ),
+            // ],
           ),
           body: RefreshIndicator(
-            onRefresh: () => provider.refresh(role: 'admin',context: context),
+            onRefresh: () => provider.refresh(context: context),
             child: Column(
               children: [
                 // Search Bar
@@ -105,7 +171,7 @@ class _AdminListScreenState extends State<AdminListScreen> {
                     controller: _searchController,
                     onChanged: (value) => setState(() {}),
                     decoration: InputDecoration(
-                      hintText: 'Search admins...',
+                      hintText: 'Search Algebra...',
                       prefixIcon: const Icon(
                         LucideIcons.search,
                         color: AppTheme.primaryColor,
@@ -135,16 +201,18 @@ class _AdminListScreenState extends State<AdminListScreen> {
                   ),
                 ),
 
-                const Divider(height: 1),
+             
 
-                // Results Count
+                // const Divider(height: 1),
+
+                // Results Count and Sort
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${filteredList.length} Admins',
+                        '${filteredList.length} Subjects',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -152,25 +220,23 @@ class _AdminListScreenState extends State<AdminListScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: AppTheme.primaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              LucideIcons.shieldCheck,
-                              size: 16,
+                            const Icon(
+                              LucideIcons.arrowUpDown,
+                              size: 18,
                               color: AppTheme.primaryColor,
                             ),
-                            6.kW,
-                            const Text(
-                              'Administrators',
-                              style: TextStyle(
-                                fontSize: 12,
+                            8.kW,
+                            Text(
+                              'Sort: $_sortBy',
+                              style: const TextStyle(
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.primaryColor,
                               ),
@@ -232,13 +298,13 @@ class _AdminListScreenState extends State<AdminListScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        LucideIcons.userX,
+                                      LucideIcons.archive,
                                         size: 64,
                                         color: AppTheme.grey.withOpacity(0.5),
                                       ),
                                       16.kH,
                                       Text(
-                                        'No admins found',
+                                        'No subjects found',
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: AppTheme.grey,
@@ -265,33 +331,40 @@ class _AdminListScreenState extends State<AdminListScreen> {
                                         ),
                                       );
                                     }
-                                    final admin = filteredList[index];
-                                    return _buildAdminTile(admin);
+                                    final sub = filteredList[index];
+                                    return _buildListTile(sub);
                                   },
                                 ),
                 ),
               ],
             ),
           ),
+
+          floatingActionButton: FloatingActionButton(onPressed: (){
+          Go.named(context,MyRouter.subjectEditCreate);
+         
+          },
+             child: Icon(LucideIcons.plus),
+             backgroundColor: AppTheme.primaryColor,
+             
+             ),
         );
       },
     );
   }
 
-  Widget _buildAdminTile(EmpUser admin) {
+  Widget _buildListTile(Subject sub) {
+   
+
     return GestureDetector(
       onTap: () {
-        Go.named(context, MyRouter.teacherDetails, extra: admin);
+        Go.named(context, MyRouter.subjectdetails,extra: {"subjectId":sub.id});
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppTheme.primaryColor.withOpacity(0.3),
-            width: 1,
-          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -302,69 +375,25 @@ class _AdminListScreenState extends State<AdminListScreen> {
         ),
         child: Row(
           children: [
-            // Admin Badge Icon
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                LucideIcons.shieldCheck,
-                color: AppTheme.primaryColor,
-                size: 24,
-              ),
-            ),
-            16.kW,
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Email
+                  // Name
                   Text(
-                    admin.email,
+                    sub.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  6.kH,
-                  // Role Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          LucideIcons.crown,
-                          size: 12,
-                          color: AppTheme.primaryColor,
-                        ),
-                        4.kW,
-                        const Text(
-                          'ADMIN',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  8.kH,
+                
+             
+   
                 ],
               ),
             ),
-            // Arrow
             Icon(
               Icons.arrow_forward_ios,
               size: 18,

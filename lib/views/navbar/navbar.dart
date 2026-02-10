@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:school_management_demo/theme/colors.dart';
+import 'package:school_management_demo/views/home/admin/admin_dashboard.dart';
 
 // Import your dashboards and settings
-import 'package:school_management_demo/views/home/Admin_dashboard.dart';
+
 import 'package:school_management_demo/views/home/student_dashboard.dart';
 import 'package:school_management_demo/views/home/teachers_dashboard.dart';
 import 'package:school_management_demo/views/home/staff_dashboard.dart';
@@ -38,7 +39,7 @@ class _NavigationHandlerState extends State<NavigationHandler> {
   List<Widget> _getPagesForRole(String role) {
     switch (role) {
       case "admin":
-        return const [
+        return  [
           AdminHomeScreen(),
           AdminHomeScreen(), // replace with AnalyticsScreen if exists
           AdminHomeScreen(), // replace with AddScreen if exists
@@ -46,7 +47,7 @@ class _NavigationHandlerState extends State<NavigationHandler> {
           SettingsScreen(),
         ];
       case "teacher":
-        return const [
+        return  [
           TeacherHomeScreen(),
           TeacherHomeScreen(), // Analytics
           TeacherHomeScreen(), // Add
@@ -59,13 +60,13 @@ class _NavigationHandlerState extends State<NavigationHandler> {
           SettingsScreen(),
         ];
       case "staff":
-        return const [
+        return  [
           StaffHomeScreen(),
           StaffHomeScreen(), // Analytics
           SettingsScreen(),
         ];
       default:
-        return const [
+        return  [
           StudentHomeScreen(),
           StudentHomeScreen(),
           SettingsScreen(),
@@ -77,7 +78,7 @@ class _NavigationHandlerState extends State<NavigationHandler> {
   List<_NavItem> _getNavItemsForRole(String role) {
     switch (role) {
       case "admin":
-        return const [
+        return  [
           _NavItem(LucideIcons.home, "Home"),
           _NavItem(LucideIcons.barChart2, "Analytics"),
           _NavItem(LucideIcons.plus, "Add"),

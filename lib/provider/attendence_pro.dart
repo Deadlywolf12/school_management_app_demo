@@ -70,7 +70,7 @@ class AttendanceProvider extends ChangeNotifier {
       final token = prefs.getToken();
 
       // API call: GET /attendance/user/:userId/monthly?month=1&year=2024
-      final endpoint = '${Api().base}user/$userId/monthly?month=$_currentMonth&year=$_currentYear';
+      final endpoint = '${Api().base}attendance/user/$userId/monthly?month=$_currentMonth&year=$_currentYear';
       
       final response = await getFunction(
         endpoint,
@@ -129,7 +129,7 @@ class AttendanceProvider extends ChangeNotifier {
 
       final response = await putFunction(
         body: request.toJson(),
-       api:  '${Api().base}${record.id}',
+       api:  '${Api().base}attendance/${record.id}',
         authorization: true,
         tokenKey: token,
       );

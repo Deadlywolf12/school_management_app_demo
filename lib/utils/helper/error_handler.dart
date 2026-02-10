@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:school_management_demo/utils/dev/log.dart';
-import 'package:school_management_demo/widgets/snack_bar.dart';
+import 'package:school_management_demo/widgets/snackbar.dart';
+
 
 
 
 
 class ErrorHandler {
-  static catchException(BuildContext context, dynamic e) {
+  static catchException( dynamic e) {
     String errorMessage;
 
     if (e is SocketException) {
@@ -23,13 +24,13 @@ class ErrorHandler {
       errorMessage = "An unexpected issue occurred.";
     }
 
-    showSnackBar(context, errorMessage);
+    SnackBarHelper.showError(errorMessage);
 
     PrintLog.logMessage('Error: $e');
     return Future.error(errorMessage);
   }
 
-  static catchExceptionMessage(BuildContext context, dynamic e) {
+  static catchExceptionMessage(dynamic e) {
     String errorMessage;
 
     if (e is SocketException) {
@@ -44,19 +45,19 @@ class ErrorHandler {
       errorMessage = "An unexpected issue occurred.";
     }
 
-    showSnackBar(context, errorMessage);
+    SnackBarHelper.showError(errorMessage);
     PrintLog.logMessage('Error: $e');
     return errorMessage;
   }
 
   static apiException(BuildContext context, dynamic e) {
-    showSnackBar(context, e);
+    SnackBarHelper.showError(e);
 
     PrintLog.logMessage('Error: $e');
   }
 
   static apiExceptionFuture(BuildContext context, dynamic e) {
-    showSnackBar(context, e);
+   SnackBarHelper.showError(e);
 
     PrintLog.logMessage('Error: $e');
     return Future.error(e);

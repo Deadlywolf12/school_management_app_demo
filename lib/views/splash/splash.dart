@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'dart:async';
@@ -7,6 +9,7 @@ import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:school_management_demo/utils/constants.dart';
+import 'package:school_management_demo/utils/helper/shared_preferences/preference_helper.dart';
 
 
 
@@ -43,22 +46,30 @@ class _SplashScreenState extends State<SplashScreen>
     // Simulate your background work
     _simulateLoadingTasks();
   }
+Future<void> _simulateLoadingTasks() async {
+  final prefs = await SharedPrefHelper.getInstance();
 
-  Future<void> _simulateLoadingTasks() async {
-    // Example: background work (API, DB, model loading, etc.)
-    await Future.delayed(const Duration(seconds: 4));
-    _isWorkDone = true;
+  await Future.delayed(const Duration(seconds: 3));
 
-    // Animate to 100% instantly
-    _controller.animateTo(1.0, duration: const Duration(milliseconds: 800));
+  _isWorkDone = true;
 
-    // Wait a bit then navigate
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        Go.namedReplace(context,MyRouter.landing);
-      }
-    });
+  await _controller.animateTo(1.0, duration: const Duration(milliseconds: 800));
+
+  await Future.delayed(const Duration(milliseconds: 600));
+
+  if (!mounted) return;
+
+  final token = prefs.getToken();
+log("token");
+  if (token.isNotEmpty) {
+    final role =  prefs.getRole();
+    log('role from splash');
+    Go.namedReplace(context, MyRouter.home, extra: role);
+  } else {
+    Go.namedReplace(context, MyRouter.landing);
   }
+}
+
 
   @override
   void dispose() {
@@ -86,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               // Title
               const Text(
-                "KhataBook",
+                "Digital Basta",
                 style: TextStyle(
                   fontSize: 50,
                   fontWeight: FontWeight.bold,
@@ -99,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               // Subtitle
               const Text(
-                "Tracking your expenses",
+                "Track your child\nSimplify school life",
                 style: TextStyle(fontSize: 18, color: AppTheme.grey),
                 textAlign: TextAlign.center,
               ),

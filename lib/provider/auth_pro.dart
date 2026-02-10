@@ -44,7 +44,7 @@ AuthResponse? get authResponse => _authResponse;
         "email": email,
         "password": password,
       },
-      Api.user.login,
+      Api.auth.signin,
     );
 
 if (response['success'] != true) {
@@ -63,7 +63,9 @@ if (response['success'] != true) {
 
 await prefs.saveToken(_authResponse!.token);
 await prefs.saveRole(_authResponse!.user.role);
+final role = prefs.getRole();
 log(_authResponse!.token);
+log(role + ' from provider');
 
 
     _status = AuthStatus.loaded;

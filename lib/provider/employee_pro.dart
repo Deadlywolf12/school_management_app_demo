@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_management_demo/helper/catch_helper.dart';
 import 'package:school_management_demo/helper/function_helper.dart';
+import 'package:school_management_demo/helper/token_expired_dialoge.dart';
 import 'package:school_management_demo/models/emp_model.dart';
 
 import 'package:school_management_demo/utils/api.dart' hide User;
@@ -48,11 +49,15 @@ class FacultyProvider extends ChangeNotifier {
   bool get isEmpty => _facultyList.isEmpty && isLoaded;
   
   /// Fetch faculty by role with pagination
-  Future<void> fetchFaculty({
+  Future<void> fetchFaculty(
+    {
     required String role,
+    required BuildContext context,
     int page = 1,
     int limit = 10,
     bool loadMore = false,
+    
+   
   }) async {
     try {
       // Set loading state
@@ -64,7 +69,7 @@ class FacultyProvider extends ChangeNotifier {
       final token = prefs.getToken();
       // Make API call
       final response = await getFunction(
-        Api.admin.getUsers(role, page: page, limit: limit),
+        Api.admin.getUsers(role:role, page: page, limit: limit),
         authorization: true,
         tokenKey: token,
       );
@@ -72,6 +77,22 @@ class FacultyProvider extends ChangeNotifier {
       // Check response success
       if (!_isSuccessResponse(response)) {
         _handleError(response);
+        return;
+      }
+
+      if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+        _facultyList = [];
+        _status = FacultyStatus.loaded;
+        _errorMessage = 'session expired';
+        notifyListeners();
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (_) => const TokenExpiredDialoge(),
+    );
+  });
+
         return;
       }
       
@@ -92,46 +113,48 @@ class FacultyProvider extends ChangeNotifier {
   }
   
   /// Load next page
-  Future<void> loadMore() async {
+  Future<void> loadMore(BuildContext context) async {
     if (!_hasMore || isLoadingMore) return;
     
     await fetchFaculty(
       role: _currentRole,
       page: _currentPage + 1,
       loadMore: true,
+      context: context
     );
   }
   
   /// Refresh data (reload from page 1)
-  Future<void> refresh({String? role}) async {
+  Future<void> refresh({String? role, required BuildContext context}) async {
     await fetchFaculty(
       role: role ?? _currentRole,
       page: 1,
       loadMore: false,
+      context: context,
     );
   }
   
   /// Get single user details by ID
-  Future<EmpUser?> getUserDetails(String userId) async {
-    try {
-      final response = await getFunction(
-        Api.admin.getUserDetails(userId),
-      );
+  // Future<EmpUser?> getUserDetails(String userId) async {
+  //   try {
+  //     final response = await getFunction(
+  //       Api.admin.getUserDetails(userId),
+  //     );
       
-      if (response['success'] != true) return null;
+  //     if (response['success'] != true) return null;
       
-      final data = response['data'] as Map<String, dynamic>?;
-      if (data == null) return null;
+  //     final data = response['data'] as Map<String, dynamic>?;
+  //     if (data == null) return null;
       
-      // Create model based on role
-      return _createUserModel(data);
+  //     // Create model based on role
+  //     return _createUserModel(data);
       
-    } catch (e) {
-      _errorMessage = getFriendlyErrorMessage(e);
-      notifyListeners();
-      return null;
-    }
-  }
+  //   } catch (e) {
+  //     _errorMessage = getFriendlyErrorMessage(e);
+  //     notifyListeners();
+  //     return null;
+  //   }
+  // }
   
   /// Delete user by ID
   Future<bool> deleteUser(String userId) async {
@@ -181,8 +204,8 @@ class FacultyProvider extends ChangeNotifier {
         return user.department.toLowerCase().contains(searchQuery) ||
             user.roleDetails.toLowerCase().contains(searchQuery);
       } else if (user is Student) {
-        return user.studentId.toLowerCase().contains(searchQuery) ||
-            user.classLevel.toLowerCase().contains(searchQuery);
+        return user.name.toLowerCase().contains(searchQuery) ||
+            user.studentRoll.toLowerCase().contains(searchQuery);
       } else if (user is Parent) {
         return user.guardianName.toLowerCase().contains(searchQuery) ||
             user.phoneNumber.contains(searchQuery);
@@ -217,7 +240,7 @@ class FacultyProvider extends ChangeNotifier {
     if (classLevel == 'All Classes') return List.from(_facultyList);
     
     return _facultyList.where((user) {
-      return user is Student && user.classLevel == classLevel;
+      return user is Student && user.classNumber.toString() == classLevel;
     }).toList();
   }
   
@@ -263,7 +286,7 @@ class FacultyProvider extends ChangeNotifier {
   
   /// Get unique classes from students
   List<String> getUniqueClasses() {
-    final classes = students.map((s) => s.classLevel).toSet().toList()..sort();
+    final classes = students.map((s) => s.classId).toSet().toList()..sort();
     return ['All Classes', ...classes];
   }
   
@@ -333,22 +356,22 @@ class FacultyProvider extends ChangeNotifier {
     }
   }
   
-  EmpUser _createUserModel(Map<String, dynamic> data) {
-    final role = data['role'] ?? _currentRole;
+  // EmpUser _createUserModel(Map<String, dynamic> data) {
+  //   final role = data['role'] ?? _currentRole;
     
-    switch (role) {
-      case 'teacher':
-        return Teacher.fromJson(data);
-      case 'staff':
-        return Staff.fromJson(data);
-      case 'student':
-        return Student.fromJson(data);
-      case 'parent':
-        return Parent.fromJson(data);
-      default:
-        return EmpUser.fromJson(data);
-    }
-  }
+  //   switch (role) {
+  //     case 'teacher':
+  //       return Teacher.fromJson(data);
+  //     case 'staff':
+  //       return Staff.fromJson(data);
+  //     case 'student':
+  //       return Student.fromJson(data);
+  //     case 'parent':
+  //       return Parent.fromJson(data);
+  //     default:
+  //       return EmpUser.fromJson(data);
+  //   }
+  // }
   
   String _getDepartment(EmpUser user) {
     if (user is Teacher) return user.department;

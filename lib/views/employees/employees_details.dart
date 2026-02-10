@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management_demo/models/emp_model.dart';
 import 'package:school_management_demo/provider/employee_pro.dart';
+import 'package:school_management_demo/route_structure/go_navigator.dart';
+import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
+import 'package:school_management_demo/theme/spacing.dart';
+import 'package:school_management_demo/widgets/custom_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TeacherDetailScreen extends StatelessWidget {
+class EmployeesDetailScreen extends StatelessWidget {
   final EmpUser user;
 
-  const TeacherDetailScreen({
+  const EmployeesDetailScreen({
     Key? key,
     required this.user,
   }) : super(key: key);
@@ -83,7 +88,7 @@ class TeacherDetailScreen extends StatelessWidget {
       avatarIcon = Icons.work;
     } else if (user is Student) {
       final student = user as Student;
-      subtitle = 'Class ${student.classLevel} • ${student.studentId}';
+      subtitle = 'Class ${student.classNumber} • ${student.studentRoll}';
       avatarIcon = Icons.person;
     } else if (user is Parent) {
       final parent = user as Parent;
@@ -446,13 +451,13 @@ class TeacherDetailScreen extends StatelessWidget {
         children: [
           _buildInfoTile(
             icon: Icons.badge,
-            label: 'Student ID',
-            value: student.studentId,
+            label: 'Student Roll',
+            value: student.studentRoll,
           ),
           _buildInfoTile(
             icon: Icons.class_,
             label: 'Class',
-            value: student.classLevel,
+            value: student.classNumber.toString(),
           ),
           _buildInfoTile(
             icon: Icons.calendar_month,
@@ -504,6 +509,14 @@ class TeacherDetailScreen extends StatelessWidget {
           ),
         ],
       ),
+        const SizedBox(height: 16),
+        _buildSection(context, title: "Guardian/Parents", children: [
+          CustomButton(child: Text("Manage Parents",style: TextStyle(color: Colors.white),), onTap: ()=>Go.named(context, MyRouter.parent_student,extra:{
+    "userId": user.id,
+    "userName": user.name,
+    "userRole": "students",
+  }, ))
+        ],),
     ];
   }
 
@@ -540,7 +553,14 @@ class TeacherDetailScreen extends StatelessWidget {
               value: parent.studentIds!.length.toString(),
             ),
         ],
-      ),
+      ),     const SizedBox(height: 16),
+        _buildSection(context, title: "Students/Childrens", children: [
+          CustomButton(child: Text("Manage Childrens",), onTap: ()=>Go.named(context, MyRouter.parent_student,extra:{
+    "userId": user.id,
+    "userName": user.name,
+    "userRole": "parents",
+  })
+        )],),
     ];
   }
 
@@ -706,27 +726,39 @@ class TeacherDetailScreen extends StatelessWidget {
   Widget _buildDeleteButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () => _showDeleteConfirmation(context),
-          icon: const Icon(Icons.delete_outline, size: 22),
-          label: Text(
-            'Delete ${_getRoleTitle()}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+             
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(LucideIcons.edit, size: 22),
+                label: Text(
+                  'Edit ${_getRoleTitle()}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
             ),
           ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
+          10.kW,
+          SizedBox(
+            width: 50,
+            height: 50,
+            child: CustomButton(onTap: ()=> _showDeleteConfirmation(context),buttoncolor: AppTheme.red,child: Icon(LucideIcons.trash2),),
+          )
+        ],
       ),
     );
   }

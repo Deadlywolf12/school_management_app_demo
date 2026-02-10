@@ -9,6 +9,7 @@ import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:school_management_demo/utils/helper/error_handler.dart';
 import 'package:school_management_demo/widgets/custom_text_field.dart';
 import 'package:school_management_demo/widgets/snackbar.dart';
 
@@ -163,32 +164,23 @@ class _SignInScreenState extends State<SignInScreen> {
                                       // Validate inputs
                                       if (_emailController.text.trim().isEmpty ||
                                           _passwordController.text.trim().isEmpty) {
-                                        FloatingSnackBar.show(
-                                          context,
-                                          message: 'Please fill in all fields',
-                                          icon: Icons.error_outline,
-                                        );
+                                       SnackBarHelper.showWarning("Please fill all the fields");
                                         return;
                                       }
 
                                       try {
-                                        // Perform login (this should set auth.status to loading)
+                                        
                                         await auth.login(
                                           _emailController.text.trim(),
                                           _passwordController.text.trim(),
                                         );
 
-                                        // Check if widget is still mounted
+                                       
                                         if (!mounted) return;
 
                                         // Handle auth status
                                         if (auth.status == AuthStatus.error) {
-                                          FloatingSnackBar.show(
-                                            context,
-                                            message: auth.errorMessage ??
-                                                'Login failed',
-                                            icon: Icons.error_outline,
-                                          );
+                                        SnackBarHelper.showError("Login failed");
                                         } else if (auth.status ==
                                             AuthStatus.loaded) {
                                           context.go('/home', extra: auth.role);
@@ -197,11 +189,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                         // Handle any errors
                                         if (!mounted) return;
 
-                                        FloatingSnackBar.show(
-                                          context,
-                                          message: 'An error occurred: $e',
-                                          icon: Icons.error_outline,
-                                        );
+                                       ErrorHandler.catchException(e);
                                       }
                                     },
                               style: ElevatedButton.styleFrom(

@@ -1,15 +1,138 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:school_management_demo/route_structure/go_navigator.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:school_management_demo/provider/quick_action_btn_service.dart';
 import 'package:school_management_demo/widgets/custom_button.dart';
 import 'package:school_management_demo/widgets/filled_box.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class AdminHomeScreen extends StatelessWidget {
+class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
+
+  @override
+  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
+}
+
+class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load quick actions when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadQuickActions();
+    });
+  }
+
+  Future<void> _loadQuickActions() async {
+    final provider = Provider.of<QuickActionsProvider>(context, listen: false);
+    await provider.loadSelectedActions();
+  }
+
+  void _handleActionTap(QuickActionItem action) {
+    // Navigate based on action ID
+    switch (action.id) {
+      case 'manage_teachers':
+        Go.named(context, MyRouter.faculty);
+        break;
+      case 'manage_students':
+          Go.named(context, MyRouter.faculty,extra: "student");
+     
+   
+        break;
+      case 'manage_fees':
+        // Go.named(context, MyRouter.manageFees);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Manage Fees - Coming soon!')),
+        );
+        break;
+      case 'manage_attendance':
+        Go.named(
+          context,
+          MyRouter.attendance,
+          extra: {
+            "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
+            "userName": "John Doe",
+            "userRole": "teacher",
+          },
+        );
+        break;
+      case 'manage_classes':
+        // Go.named(context, MyRouter.manageClasses);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Manage Classes - Coming soon!')),
+        );
+        break;
+      case 'manage_subjects':
+        Go.named(context, MyRouter.subjects);
+      
+        break;
+      case 'manage_exams':
+        // Go.named(context, MyRouter.manageExams);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Manage Exams - Coming soon!')),
+        );
+        break;
+      case 'manage_grades':
+        // Go.named(context, MyRouter.manageGrades);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Manage Grades - Coming soon!')),
+        );
+        break;
+      case 'manage_salary':
+        // Go.named(context, MyRouter.manageSalary);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Manage Salary - Coming soon!')),
+        );
+        break;
+      case 'reports':
+        // Go.named(context, MyRouter.reports);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Reports - Coming soon!')),
+        );
+        break;
+      case 'settings':
+        // Go.named(context, MyRouter.settings);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Settings - Coming soon!')),
+        );
+        break;
+      case 'notifications':
+        // Go.named(context, MyRouter.notifications);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Notifications - Coming soon!')),
+        );
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Feature coming soon!')),
+        );
+    }
+  }
+
+  Future<void> _navigateToEditQuickButtons() async {
+    final result = await Go.named(context, MyRouter.QuickButtons);
+
+    // Always reload when returning
+    if (mounted) {
+      await _loadQuickActions();
+
+      // Show success message if saved
+      if (result == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Quick actions updated successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,12 +213,12 @@ class AdminHomeScreen extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        // Navigate to students screen
-                        // Go.named(context, MyRouter.students);
+                       Go.named(context, MyRouter.faculty,extra: "student");
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                         child: Column(
                           children: [
                             Icon(
@@ -130,11 +253,12 @@ class AdminHomeScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Navigate to teachers screen
-                        Go.named(context, MyRouter.teachers);
+                        Go.named(context, MyRouter.faculty);
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                         child: Column(
                           children: [
                             Icon(
@@ -179,7 +303,8 @@ class AdminHomeScreen extends StatelessWidget {
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                         child: Column(
                           children: [
                             Icon(
@@ -214,19 +339,20 @@ class AdminHomeScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Navigate to attendance screen
-                    Go.named(
-  context,
-  MyRouter.attendance,
-  extra: {
-    "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
-    "userName": "John Doe",
-    "userRole": "teacher",
-  },
-);
+                        Go.named(
+                          context,
+                          MyRouter.attendance,
+                          extra: {
+                            "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
+                            "userName": "John Doe",
+                            "userRole": "teacher",
+                          },
+                        );
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                         child: Column(
                           children: [
                             Icon(
@@ -314,8 +440,16 @@ class AdminHomeScreen extends StatelessWidget {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 getTitlesWidget: (value, meta) {
-                                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                                  if (value.toInt() >= 0 && value.toInt() < months.length) {
+                                  const months = [
+                                    'Jan',
+                                    'Feb',
+                                    'Mar',
+                                    'Apr',
+                                    'May',
+                                    'Jun'
+                                  ];
+                                  if (value.toInt() >= 0 &&
+                                      value.toInt() < months.length) {
                                     return Text(
                                       months[value.toInt()],
                                       style: TextStyle(
@@ -436,92 +570,150 @@ class AdminHomeScreen extends StatelessWidget {
 
               30.kH,
 
-            //quick action
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Quick Actions",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                 Text(
-                      "Edit",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                ],
-              ),
-
-              15.kH,
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      context,
-                      icon: LucideIcons.graduationCap,
-                      title: "Manage\nTeachers",
-                      onTap: () {
-                        // Navigate to manage teachers
-                        // Go.named(context, MyRouter.manageTeachers);
-                      },
-                    ),
-                  ),
-                  15.kW,
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      context,
-                      icon: LucideIcons.users,
-                      title: "Manage\nStudents",
-                      onTap: () {
-                        // Navigate to manage students
-                        // Go.named(context, MyRouter.manageStudents);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              15.kH,
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      context,
-                      icon: LucideIcons.dollarSign,
-                      title: "Manage\nFees",
-                      onTap: () {
-                        // Navigate to manage fees
-                        // Go.named(context, MyRouter.manageFees);
-                      },
-                    ),
-                  ),
-                  15.kW,
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      context,
-                      icon: LucideIcons.clipboardCheck,
-                      title: "Manage\nAttendance",
-                      onTap: () {
-                        // Navigate to manage attendance
-                        // Go.named(context, MyRouter.manageAttendance);
-                      },
-                    ),
-                  ),
-                ],
-              ),
+              // 🚀 Quick Actions Section (Using Provider)
+              _buildQuickActionsSection(),
 
               20.kH,
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsSection() {
+    return Column(
+      children: [
+        // Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Quick Actions",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            GestureDetector(
+              onTap: _navigateToEditQuickButtons,
+              child: Text(
+                "Edit",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        15.kH,
+
+        // Consumer to listen to provider changes
+        Consumer<QuickActionsProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(40),
+                  child: CircularProgressIndicator(
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              );
+            }
+
+            if (provider.selectedActions.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            return _buildQuickActionsGrid(provider.selectedActions);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionsGrid(List<QuickActionItem> actions) {
+    // Calculate number of rows needed
+    final itemCount = actions.length;
+    final rows = (itemCount / 2).ceil();
+
+    return Column(
+      children: List.generate(rows, (rowIndex) {
+        final startIndex = rowIndex * 2;
+        final endIndex = (startIndex + 2).clamp(0, itemCount);
+        final rowItems = actions.sublist(startIndex, endIndex);
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: rowIndex < rows - 1 ? 15 : 0),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  context,
+                  icon: rowItems[0].icon,
+                  title: rowItems[0].title,
+                  onTap: () => _handleActionTap(rowItems[0]),
+                ),
+              ),
+              if (rowItems.length > 1) ...[
+                15.kW,
+                Expanded(
+                  child: _buildQuickActionCard(
+                    context,
+                    icon: rowItems[1].icon,
+                    title: rowItems[1].title,
+                    onTap: () => _handleActionTap(rowItems[1]),
+                  ),
+                ),
+              ] else
+                Expanded(child: SizedBox()),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.grey.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            LucideIcons.info,
+            size: 48,
+            color: AppTheme.grey.withOpacity(0.6),
+          ),
+          16.kH,
+          Text(
+            'No quick actions selected',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).disabledColor,
+            ),
+          ),
+          8.kH,
+          Text(
+            'Tap "Edit" to customize your quick actions',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppTheme.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -622,6 +814,7 @@ class AdminHomeScreen extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.all(Radius.circular(20)),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,

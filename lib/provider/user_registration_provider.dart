@@ -36,7 +36,7 @@ class UserRegistrationProvider extends ChangeNotifier {
       // Make API call
       final response = await postFunction(
         registration.toJson(),
-        Api.admin.createUser(),
+        Api.admin.createUser,
         authorization: true,
         tokenKey: token,
       );

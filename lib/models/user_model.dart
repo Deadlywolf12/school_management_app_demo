@@ -31,6 +31,7 @@ class User {
   final String email;
 
   final String role;
+  final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -39,6 +40,7 @@ class User {
     required this.email,
   
     required this.role,
+    required this.status,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -50,7 +52,7 @@ class User {
     
       role: json['role'],
       createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),status:  json['status'],
     );
   }
 
@@ -60,6 +62,7 @@ class User {
       'email': email,
  
       'role': role,
+      'status': status,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };

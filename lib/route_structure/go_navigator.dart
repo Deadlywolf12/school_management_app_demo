@@ -59,11 +59,13 @@ static onNamedReplace(
     String screen, {
     Map<String, String> params = const <String, String>{},
     Map<String, dynamic> queryParams = const <String, dynamic>{},
+     Object? extra,
   }) {
     context.goNamed(
       screen,
       queryParameters: queryParams,
       pathParameters: params,
+      extra: extra,
     );
   }
 

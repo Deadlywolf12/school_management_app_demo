@@ -10,14 +10,15 @@ import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class FacultyDirectoryScreen extends StatefulWidget {
-  const FacultyDirectoryScreen({Key? key}) : super(key: key);
+  final String? role; // 'teacher', 'staff', 'student', 'parent'
+  const FacultyDirectoryScreen({Key? key, this.role}) : super(key: key);
 
   @override
   State<FacultyDirectoryScreen> createState() => _FacultyDirectoryScreenState();
 }
 
 class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
-  String _selectedRole = 'teacher';
+  String _selectedRole = ''; // Default to teachers
   final TextEditingController _searchController = TextEditingController();
   String _selectedDepartment = 'All Departments';
   String _selectedSubject = 'All Subjects';
@@ -28,6 +29,8 @@ class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
   @override
   void initState() {
     super.initState();
+
+    _selectedRole = widget.role ?? 'teacher';
     // Fetch initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchData();
@@ -46,7 +49,7 @@ class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
 
   void _fetchData() {
     final provider = context.read<FacultyProvider>();
-    provider.fetchFaculty(role: _selectedRole);
+    provider.fetchFaculty(role: _selectedRole,context: context);
   }
 
   void _onScroll() {
@@ -54,7 +57,7 @@ class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
         _scrollController.position.maxScrollExtent - 200) {
       final provider = context.read<FacultyProvider>();
       if (provider.hasMore && !provider.isLoadingMore) {
-        provider.loadMore();
+        provider.loadMore(context);
       }
     }
   }
@@ -357,7 +360,7 @@ class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
             ],
           ),
           body: RefreshIndicator(
-            onRefresh: () => provider.refresh(role: _selectedRole),
+            onRefresh: () => provider.refresh(role: _selectedRole,context: context),
             child: Column(
               children: [
                 // Search Bar
@@ -660,7 +663,7 @@ class _FacultyDirectoryScreenState extends State<FacultyDirectoryScreen> {
       department = user.department;
       subjectOrRole = user.roleDetails;
     } else if (user is Student) {
-      department = 'Class ${user.classLevel}';
+      department = 'Class ${user.classNumber}';
       subjectOrRole = 'Year ${user.enrollmentYear}';
     } else if (user is Parent) {
       department = 'Guardian';

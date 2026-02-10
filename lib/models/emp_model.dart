@@ -149,12 +149,13 @@ class Staff extends EmpUser {
     };
   }
 }
-
 // Student Model
 class Student extends EmpUser {
   final String? gender;
-  final String studentId;
-  final String classLevel;
+  final String studentRoll;
+  final String classId;
+  final int classNumber;
+  final String section;
   final int enrollmentYear;
   final String? emergencyNumber;
   final String address;
@@ -166,8 +167,10 @@ class Student extends EmpUser {
     required super.name,
     required super.email,
     this.gender,
-    required this.studentId,
-    required this.classLevel,
+    required this.studentRoll,
+    required this.classId,
+    required this.classNumber,
+    required this.section,
     required this.enrollmentYear,
     this.emergencyNumber,
     required this.address,
@@ -181,14 +184,16 @@ class Student extends EmpUser {
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       gender: json['gender'],
-      studentId: json['studentId'] ?? '',
-      classLevel: json['class'] ?? json['classLevel'] ?? '',
+      studentRoll: json['studentRoll'] ?? '',
+      classId: json['classId'] ?? '',
+      classNumber: json['classNumber'] ?? 0,
+      section: json['section'] ?? '',
       enrollmentYear: json['enrollmentYear'] ?? DateTime.now().year,
       emergencyNumber: json['emergencyNumber'],
       address: json['address'] ?? '',
       bloodGroup: json['bloodGroup'],
       dateOfBirth: json['dateOfBirth'] != null
-          ? DateTime.parse(json['dateOfBirth'])
+          ? DateTime.tryParse(json['dateOfBirth'])
           : null,
     );
   }
@@ -197,8 +202,10 @@ class Student extends EmpUser {
     return {
       ...super.toJson(),
       'gender': gender,
-      'studentId': studentId,
-      'class': classLevel,
+      'studentRoll': studentRoll,
+      'classId': classId,
+      'classNumber': classNumber,
+      'section': section,
       'enrollmentYear': enrollmentYear,
       'emergencyNumber': emergencyNumber,
       'address': address,
