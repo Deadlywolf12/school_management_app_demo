@@ -1,6 +1,9 @@
 
 
+
+
 import 'package:go_router/go_router.dart';
+import 'package:school_management_demo/models/classes_model.dart';
 import 'package:school_management_demo/models/emp_model.dart';
 import 'package:school_management_demo/models/subjects_model.dart';
 import 'package:school_management_demo/views/attendence/attendence.dart';
@@ -9,6 +12,9 @@ import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
 import 'package:school_management_demo/views/auth/set_new_pass.dart';
 import 'package:school_management_demo/views/auth/signin.dart';
+import 'package:school_management_demo/views/classes/class_edit.dart';
+import 'package:school_management_demo/views/classes/classes_details.dart';
+import 'package:school_management_demo/views/classes/classes_screen.dart';
 
 import 'package:school_management_demo/views/employees/employee_create.dart';
 import 'package:school_management_demo/views/employees/employees_list.dart';
@@ -50,7 +56,10 @@ class MyRouter {
   static const String createUser = 'createUser';
   static const String subjects = 'subjects';
   static const String subjectdetails = 'subjectdetails';
+  static const String classDetails = 'classDetails';
+  static const String manageClasses = 'manageClasses';
   static const String subjectEditCreate = 'subjectEditCreate';
+  static const String classEditCreate = 'classEditCreate';
   static const String adminlist = 'adminlist';
   static const String parent_student = 'parent_student';
 
@@ -203,6 +212,37 @@ GoRoute(
         builder: (context, state) {
     final teacher = state.extra as EmpUser;
     return EmployeesDetailScreen(user: teacher);
+  },
+      ),
+        GoRoute(
+        path: '/$classDetails',
+        name: classDetails,
+        
+        builder: (context, state) {
+           final extra = state.extra as Map<String, dynamic>;
+  final classId = extra['classId'] as String;
+    final classNumber = extra['classNumber'] as int;
+    return ClassDetailScreen(classId: classId,classNum: classNumber);
+  },
+      ),
+
+          GoRoute(
+        path: '/$classEditCreate',
+        name: classEditCreate,
+        
+        builder: (context, state) {
+    final schoolClass = state.extra as SchoolClass;
+    return ClassEditScreen(classData: schoolClass,);
+  },
+      ),
+
+       GoRoute(
+        path: '/$manageClasses',
+        name: manageClasses,
+        
+        builder: (context, state) {
+   
+    return ClassesScreen();
   },
       ),
      

@@ -73,14 +73,8 @@ class FacultyProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
-      
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        _handleError(response);
-        return;
-      }
 
-      if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
         _facultyList = [];
         _status = FacultyStatus.loaded;
         _errorMessage = 'session expired';
@@ -95,6 +89,14 @@ class FacultyProvider extends ChangeNotifier {
 
         return;
       }
+      
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        _handleError(response);
+        return;
+      }
+
+    
       
       // Parse response
       final facultyResponse = FacultyResponse.fromJson(response);
@@ -157,30 +159,46 @@ class FacultyProvider extends ChangeNotifier {
   // }
   
   /// Delete user by ID
-  Future<bool> deleteUser(String userId) async {
-    try {
-      final response = await deleteFunction(
-       api: '', body: {},
-      );
+  // Future<bool> deleteUser(String userId,BuildContext context) async {
+  //   try {
+  //     final response = await deleteFunction(
+  //      api: '', body: {},
+  //     );
       
-      if (response['success'] == true) {
-        // Remove from local list
-        _facultyList.removeWhere((user) => user.id == userId);
-        _totalCount = _totalCount > 0 ? _totalCount - 1 : 0;
-        notifyListeners();
-        return true;
-      }
+  //     if (response['success'] == true) {
+  //       // Remove from local list
+  //       _facultyList.removeWhere((user) => user.id == userId);
+  //       _totalCount = _totalCount > 0 ? _totalCount - 1 : 0;
+  //       notifyListeners();
+  //       return true;
+  //     }
+
+  //       if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+  //       _facultyList = [];
+  //       _status = FacultyStatus.loaded;
+  //       _errorMessage = 'session expired';
+  //       notifyListeners();
+  //        WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false, 
+  //     builder: (_) => const TokenExpiredDialoge(),
+  //   );
+  // });
+
+  //       return false;
+  //     }
       
-      _errorMessage = response['message'] ?? 'Failed to delete user';
-      notifyListeners();
-      return false;
+  //     _errorMessage = response['message'] ?? 'Failed to delete user';
+  //     notifyListeners();
+  //     return false;
       
-    } catch (e) {
-      _errorMessage = getFriendlyErrorMessage(e);
-      notifyListeners();
-      return false;
-    }
-  }
+  //   } catch (e) {
+  //     _errorMessage = getFriendlyErrorMessage(e);
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
   
   /// Search users by query (Fixed: Return immutable list)
   List<EmpUser> search(String query) {

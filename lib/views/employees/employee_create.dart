@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:school_management_demo/models/subjects_model.dart';
 import 'package:school_management_demo/models/user_account_models.dart';
+import 'package:school_management_demo/provider/subjects_pro.dart';
 import 'package:school_management_demo/provider/user_registration_provider.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
@@ -19,6 +21,14 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   
   // Primary color
   static const Color primaryColor = Color(0xFF77CED9);
+
+
+@override
+  void initState() {
+   
+    super.initState();
+    fetchSubjects();
+  }
 
   // Controllers for common fields
   final _emailController = TextEditingController();
@@ -57,7 +67,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   String? _selectedGender;
   String? _selectedDepartment;
   String? _selectedClass;
-  String? _selectedSubject;
+  Subject? _selectedSubject;
   String? _selectedBloodGroup;
   DateTime? _dateOfBirth;
   DateTime? _joiningDate;
@@ -83,17 +93,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     '7-A', '7-B', '8-A', '8-B', '9-A', '9-B',
     '10-A', '10-B', '11-A', '11-B', '12-A', '12-B',
   ];
-  final List<String> _subjects = [
-    'Physics',
-    'Chemistry',
-    'Biology',
-    'Mathematics',
-    'English',
-    'History',
-    'Geography',
-    'Computer Science',
-    'Physical Education',
-  ];
+  
   final List<String> _bloodGroups = [
     'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
   ];
@@ -239,7 +239,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         name: _teacherNameController.text.trim(),
         employeeId: _teacherEmployeeIdController.text.trim(),
         department: _selectedDepartment!,
-        subject: _selectedSubject!,
+        subject: _selectedSubject!.name  ,
         classTeacher: _classTeacherController.text.trim().isNotEmpty
             ? _classTeacherController.text.trim()
             : null,
@@ -408,6 +408,30 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         ),
       ),
     );
+  }
+
+
+bool _isLoading = false;
+
+  Future<void>fetchSubjects()async{
+
+    setState(() {
+          _isLoading = true;
+    });
+
+    
+    final provider = Provider.of<SubjectsProvider>(listen: false,context);
+   final result =  await provider.fetchSubjectsForUserCreation(context: context);
+
+    if(result){
+      setState(() {
+          _isLoading = false;
+    });
+
+    }else{
+      _showErrorSnackBar("Failed to load subjects");
+    }
+
   }
 
   @override
@@ -760,7 +784,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+       
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -809,13 +833,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
             validator: (value) => value == null ? 'Department is required' : null,
           ),
           16.kH,
-          DropdownButtonFormField<String>(
+          DropdownButtonFormField<Subject>(
             value: _selectedSubject,
             decoration: _inputDecoration('Subject *', Icons.book),
-            items: _subjects.map((subj) {
+            items: Provider.of<SubjectsProvider>(listen: false,context).getListOfSubjects?.map((subj) {
               return DropdownMenuItem(
                 value: subj,
-                child: Text(subj),
+                child: Text(subj.name),
               );
             }).toList(),
             onChanged: (value) => setState(() => _selectedSubject = value),

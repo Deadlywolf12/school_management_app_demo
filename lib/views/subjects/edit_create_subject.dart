@@ -213,7 +213,7 @@ class _SubjectEditScreenState extends State<SubjectEditScreen> {
         ),
         title: Text(
           isEditMode ? 'Edit Subject' : 'Create Subject',
-          style: const TextStyle(color: Colors.white),
+         
         ),
       ),
       body: Form(
@@ -343,11 +343,14 @@ class _SubjectEditScreenState extends State<SubjectEditScreen> {
           // Subject Name
           TextFormField(
             controller: _nameController,
+            
             decoration: _inputDecoration(
+              
               'Subject Name *',
               LucideIcons.fileText,
               'e.g., Mathematics',
             ),
+            
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Subject name is required';
@@ -447,17 +450,12 @@ class _SubjectEditScreenState extends State<SubjectEditScreen> {
       ),
       prefixIcon: Icon(icon, color: primaryColor, size: 20),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 2),
-      ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
+              ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red),
@@ -466,8 +464,8 @@ class _SubjectEditScreenState extends State<SubjectEditScreen> {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red, width: 2),
       ),
-      filled: true,
-      fillColor: Colors.grey[50],
+
+    
     );
   }
 }

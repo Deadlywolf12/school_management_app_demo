@@ -67,12 +67,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        _handleError(response);
-        return;
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -89,6 +83,12 @@ class SubjectsProvider extends ChangeNotifier {
 
         return;
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        _handleError(response);
+        return;
+      }
+
 
       // Parse response
       _subjectsResponse = SubjectListResponse.fromJson(response);
@@ -101,6 +101,56 @@ class SubjectsProvider extends ChangeNotifier {
       _handleException(e);
     }
   }
+
+   Future<bool> fetchSubjectsForUserCreation({required BuildContext context}) async {
+    try {
+
+
+      final prefs = await SharedPrefHelper.getInstance();
+      final token = prefs.getToken();
+      // Make API call
+      final response = await getFunction(
+        Api.subjects.getAllSubjects,
+        authorization: true,
+        tokenKey: token,
+      );
+
+      if (response['msg'] == 'User not found' ||
+          response['msg'] == 'Token Expired' ||
+          response['msg'] == 'Invalid token') {
+        _status = SubjectsStatus.loaded;
+        _errorMessage = 'session expired';
+        notifyListeners();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const TokenExpiredDialoge(),
+          );
+        });
+
+        return false;
+      }
+
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        _handleError(response);
+        return false;
+      }
+
+_subjectsResponse = null;
+      _subjectsResponse = SubjectListResponse.fromJson(response);
+
+
+      _errorMessage = null;
+      return true;
+   
+    } catch (e) {
+      // _handleException(e);
+      return false;
+    }
+  }
+
 
   Future<void> fetchSubjectDetails({
     required String subjectId,
@@ -119,12 +169,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        _handleError(response);
-        return;
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -141,6 +185,12 @@ class SubjectsProvider extends ChangeNotifier {
 
         return;
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        _handleError(response);
+        return;
+      }
+
 
       // Parse response
       _subjectsDetailsResponse = SubjectDetailResponse.fromJson(response);
@@ -171,12 +221,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        _handleError(response);
-        return;
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -193,6 +237,12 @@ class SubjectsProvider extends ChangeNotifier {
 
         return;
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        _handleError(response);
+        return;
+      }
+
 
       // Parse response
       _subjectTeachersResult = SubjectTeachersResult.fromJson(response);
@@ -225,11 +275,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        return response['message'] ?? 'An unknown error occured';
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -246,6 +291,11 @@ class SubjectsProvider extends ChangeNotifier {
 
         return errorMessage ?? "Session Expired";
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
+      }
+
 
       _errorMessage = null;
       notifyListeners();
@@ -275,11 +325,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        return response['message'] ?? 'An unknown error occured';
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -296,6 +341,11 @@ class SubjectsProvider extends ChangeNotifier {
 
         return errorMessage ?? "Session Expired";
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
+      }
+
 
       _errorMessage = null;
     
@@ -325,11 +375,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        return response['message'] ?? 'An unknown error occured';
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -345,6 +390,11 @@ class SubjectsProvider extends ChangeNotifier {
         });
 
         return errorMessage ?? "Session Expired";
+      }
+
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
       }
 
       _errorMessage = null;
@@ -379,11 +429,6 @@ class SubjectsProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        return response['message'] ?? 'An unknown error occured';
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -400,6 +445,11 @@ class SubjectsProvider extends ChangeNotifier {
 
         return errorMessage ?? "Session Expired";
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
+      }
+
 
       _errorMessage = null;
       notifyListeners();
@@ -449,11 +499,6 @@ if (description != null && description.isNotEmpty) {
         tokenKey: token,
       );
 
-      // Check response success
-      if (!_isSuccessResponse(response)) {
-        return response['message'] ?? 'An unknown error occured';
-      }
-
       if (response['msg'] == 'User not found' ||
           response['msg'] == 'Token Expired' ||
           response['msg'] == 'Invalid token') {
@@ -470,6 +515,11 @@ if (description != null && description.isNotEmpty) {
 
         return errorMessage ?? "Session Expired";
       }
+      // Check response success
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
+      }
+
 
       _errorMessage = null;
       await fetchSubjectDetails(subjectId: subjectId, context: context);

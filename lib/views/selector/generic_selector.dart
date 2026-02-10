@@ -10,36 +10,60 @@ class GenericSelectorScreen<T extends SelectableItem> extends StatefulWidget {
   final bool multiSelect;
   final List<String>? preSelectedIds;
 
+  /// IDs that cannot be deselected by the user.
+  ///
+  /// - `null` (default) → all [preSelectedIds] are locked
+  /// - `[]`             → nothing is locked, all pre-selected can be toggled
+  /// - `['id1', ...]`   → only those specific IDs are locked
+  final List<String>? lockedIds;
+
   const GenericSelectorScreen({
     Key? key,
     required this.title,
     this.multiSelect = false,
     this.preSelectedIds,
+    this.lockedIds,
   }) : super(key: key);
 
   @override
-  State<GenericSelectorScreen<T>> createState() => _GenericSelectorScreenState<T>();
+  State<GenericSelectorScreen<T>> createState() =>
+      _GenericSelectorScreenState<T>();
 }
 
-class _GenericSelectorScreenState<T extends SelectableItem> extends State<GenericSelectorScreen<T>> {
+class _GenericSelectorScreenState<T extends SelectableItem>
+    extends State<GenericSelectorScreen<T>> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final Set<String> _selectedIds = {};
 
+  late final Set<String> _lockedIds;
+
   @override
   void initState() {
     super.initState();
+
     if (widget.preSelectedIds != null) {
       _selectedIds.addAll(widget.preSelectedIds!);
     }
+
+    // null  → lock all preSelected (default)
+    // []    → lock nothing
+    // [...] → lock only those IDs
+    _lockedIds = widget.lockedIds == null
+        ? Set<String>.from(widget.preSelectedIds ?? [])
+        : Set<String>.from(widget.lockedIds!);
+
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GenericSelectorProvider<T>>().loadItems(refresh: true);
     });
   }
 
+  bool _isLocked(String id) => _lockedIds.contains(id);
+
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
       context.read<GenericSelectorProvider<T>>().loadItems();
     }
   }
@@ -61,9 +85,9 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
         actions: widget.multiSelect
             ? [
                 TextButton.icon(
-                  onPressed: _selectedIds.isEmpty ? null : () {
-                    Navigator.pop(context, _selectedIds.toList());
-                  },
+                  onPressed: _selectedIds.isEmpty
+                      ? null
+                      : () => Navigator.pop(context, _selectedIds.toList()),
                   icon: const Icon(Icons.check),
                   label: Text('Done (${_selectedIds.length})'),
                   style: TextButton.styleFrom(
@@ -88,6 +112,7 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
       child: TextField(
         controller: _searchController,
         onChanged: (value) {
+          setState(() {});
           context.read<GenericSelectorProvider<T>>().search(value);
         },
         decoration: InputDecoration(
@@ -98,6 +123,7 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
+                    setState(() {});
                     context.read<GenericSelectorProvider<T>>().search('');
                   },
                 )
@@ -144,8 +170,9 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
 
               final item = provider.items[index];
               final isSelected = _selectedIds.contains(item.id);
+              final isLocked = _isLocked(item.id);
 
-              return _buildItemCard(item, isSelected, isDark, provider);
+              return _buildItemCard(item, isSelected, isLocked, isDark, provider);
             },
           ),
         );
@@ -153,32 +180,65 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
     );
   }
 
-  Widget _buildItemCard(T item, bool isSelected, bool isDark, GenericSelectorProvider<T> provider) {
+  Widget _buildItemCard(
+    T item,
+    bool isSelected,
+    bool isLocked,
+    bool isDark,
+    GenericSelectorProvider<T> provider,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      color: isDark ? AppTheme.cardColor : Colors.white,
+      color: isLocked
+          ? (isDark
+              ? AppTheme.cardColor
+              : AppTheme.primaryColor.withOpacity(0.04))
+          : (isDark ? AppTheme.cardColor : Colors.white),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isSelected
-            ? const BorderSide(color: AppTheme.primaryColor, width: 2)
+            ? BorderSide(
+                color: isLocked
+                    ? AppTheme.primaryColor.withOpacity(0.4)
+                    : AppTheme.primaryColor,
+                width: 2,
+              )
             : BorderSide.none,
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: widget.multiSelect
-            ? Checkbox(
-                value: isSelected,
-                onChanged: (bool? value) {
-                  setState(() {
-                    if (value == true) {
-                      _selectedIds.add(item.id);
-                    } else {
-                      _selectedIds.remove(item.id);
-                    }
-                  });
-                },
-                activeColor: AppTheme.primaryColor,
-              )
+            ? isLocked
+                // Locked: show a styled lock badge instead of a checkbox
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(
+                        Icons.lock_outline,
+                        size: 15,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
+                  )
+                : Checkbox(
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value == true) {
+                          _selectedIds.add(item.id);
+                        } else {
+                          _selectedIds.remove(item.id);
+                        }
+                      });
+                    },
+                    activeColor: AppTheme.primaryColor,
+                  )
             : CircleAvatar(
                 backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
                 child: Text(
@@ -204,50 +264,70 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
                 ),
               )
             : null,
-        trailing: isSelected
-            ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
-            : null,
-        onTap: () async {
-          if (widget.multiSelect) {
-            setState(() {
-              if (isSelected) {
-                _selectedIds.remove(item.id);
-              } else {
-                _selectedIds.add(item.id);
-              }
-            });
-          } else {
-            try {
-              // Check if onSelect callback exists in provider
-              if (provider.onSelect != null) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => const Center(child: CircularProgressIndicator()),
-                );
-                
-                await provider.selectItem(item);
-                
-                if (mounted) {
-                  Navigator.pop(context); // Close loading dialog
-                  Navigator.pop(context, item); // Return selected item
-                }
-              } else {
-                Navigator.pop(context, item);
-              }
-            } catch (e) {
-              if (mounted) {
-                Navigator.pop(context); // Close loading dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error: ${e.toString()}'),
-                    backgroundColor: AppTheme.errorColor,
+        trailing: isLocked
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Current',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.primaryColor.withOpacity(0.7),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                );
-              }
-            }
-          }
-        },
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.check_circle,
+                    color: AppTheme.primaryColor.withOpacity(0.5),
+                  ),
+                ],
+              )
+            : isSelected
+                ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                : null,
+        // Locked items are completely non-interactive
+        onTap: isLocked
+            ? null
+            : () async {
+                if (widget.multiSelect) {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedIds.remove(item.id);
+                    } else {
+                      _selectedIds.add(item.id);
+                    }
+                  });
+                } else {
+                  try {
+                    if (provider.onSelect != null) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
+                      await provider.selectItem(item);
+                      if (mounted) {
+                        Navigator.pop(context);
+                        Navigator.pop(context, item);
+                      }
+                    } else {
+                      Navigator.pop(context, item);
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: AppTheme.errorColor,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
       ),
     );
   }
@@ -265,10 +345,7 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
           const SizedBox(height: 16),
           Text(
             'No items found',
-            style: TextStyle(
-              fontSize: 18,
-              color: AppTheme.grey,
-            ),
+            style: TextStyle(fontSize: 18, color: AppTheme.grey),
           ),
         ],
       ),
@@ -289,9 +366,8 @@ class _GenericSelectorScreenState<T extends SelectableItem> extends State<Generi
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
-              context.read<GenericSelectorProvider<T>>().loadItems(refresh: true);
-            },
+            onPressed: () =>
+                context.read<GenericSelectorProvider<T>>().loadItems(refresh: true),
             child: const Text('Retry'),
           ),
         ],

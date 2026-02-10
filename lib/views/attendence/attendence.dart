@@ -44,6 +44,7 @@ class _AttendanceMarkingScreenState extends State<AttendanceMarkingScreen> {
     provider.fetchMonthlyAttendance(
       userId: widget.userId,
       month: _focusedDay,
+      context: context
     );
   }
 
@@ -232,6 +233,7 @@ class _AttendanceMarkingScreenState extends State<AttendanceMarkingScreen> {
     final success = await provider.updateAttendance(
       date: date,
       status: status,
+      context: context
     );
 
     // Hide loading
@@ -430,7 +432,7 @@ class _AttendanceMarkingScreenState extends State<AttendanceMarkingScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<AttendanceProvider>().refresh();
+              context.read<AttendanceProvider>().refresh(context);
             },
           ),
         ],

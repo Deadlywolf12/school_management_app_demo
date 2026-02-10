@@ -62,7 +62,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         );
         break;
       case 'manage_classes':
-        // Go.named(context, MyRouter.manageClasses);
+        Go.named(context, MyRouter.manageClasses);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Manage Classes - Coming soon!')),
         );

@@ -178,3 +178,30 @@ class SelectableExam implements SelectableItem {
     );
   }
 }
+
+
+class SelectableSubject implements SelectableItem {
+  final String name;
+  final String subjectId;
+
+  SelectableSubject({
+    required this.subjectId,
+    required this.name,
+  });
+
+  @override
+  String get id => subjectId;
+
+  @override
+  String get displayName => name;
+
+  @override
+  String? get subtitle => null;
+
+  factory SelectableSubject.fromJson(Map<String, dynamic> json) {
+    return SelectableSubject(
+      subjectId: json['id'].toString(),
+      name: json['name'] ?? 'Unknown',
+    );
+  }
+}

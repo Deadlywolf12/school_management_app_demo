@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_management_demo/helper/catch_helper.dart';
 import 'package:school_management_demo/helper/function_helper.dart';
+import 'package:school_management_demo/helper/token_expired_dialoge.dart';
 import 'package:school_management_demo/models/attendence_model.dart';
 
 import 'package:school_management_demo/utils/api.dart';
@@ -55,6 +56,7 @@ class AttendanceProvider extends ChangeNotifier {
   Future<void> fetchMonthlyAttendance({
     required String userId,
     DateTime? month,
+   required BuildContext context
   }) async {
     try {
       _state = AttendanceLoadingState.loading;
@@ -92,6 +94,22 @@ class AttendanceProvider extends ChangeNotifier {
         _state = AttendanceLoadingState.loaded;
         _errorMessage = null;
       } else {
+          if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+   
+        _state = AttendanceLoadingState.loaded;
+        _errorMessage = 'session expired';
+        notifyListeners();
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (_) => const TokenExpiredDialoge(),
+    );
+  });
+
+        return;
+      }
+      
         _handleError(response['message'] ?? 'Failed to load attendance');
       }
 
@@ -107,6 +125,7 @@ class AttendanceProvider extends ChangeNotifier {
   Future<bool> updateAttendance({
     required DateTime date,
     required AttendanceStatus status,
+    required BuildContext context,
     String? remarks,
   }) async {
     try {
@@ -149,6 +168,21 @@ class AttendanceProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
+           if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+   
+        _state = AttendanceLoadingState.loaded;
+        _errorMessage = 'session expired';
+        notifyListeners();
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (_) => const TokenExpiredDialoge(),
+    );
+  });
+
+        return false;
+      }
         _errorMessage = response['message'] ?? 'Failed to update attendance';
         notifyListeners();
         return false;
@@ -204,10 +238,11 @@ class AttendanceProvider extends ChangeNotifier {
   }
 
   /// Refresh attendance data
-  Future<void> refresh() async {
+  Future<void> refresh(BuildContext context) async {
     if (_currentUserId != null) {
       await fetchMonthlyAttendance(
         userId: _currentUserId!,
+        context: context,
         month: DateTime(_currentYear, _currentMonth),
       );
     }

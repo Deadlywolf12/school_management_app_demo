@@ -897,14 +897,14 @@ class EmployeesDetailScreen extends StatelessWidget {
     );
 
     // Perform delete operation
-    final success = await provider.deleteUser(user.id);
+    // final success = await provider.deleteUser(user.id,context);
 
     // Hide loading indicator
     if (context.mounted) {
       Navigator.pop(context);
     }
 
-    if (success) {
+    if (true) {
       // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

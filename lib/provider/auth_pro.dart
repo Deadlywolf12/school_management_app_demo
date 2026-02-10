@@ -103,21 +103,4 @@ _errorMessage = getFriendlyErrorMessage(e);
 
 
 
-  // Method to fetch current user profile
-  Future<void> fetchUserProfile() async {
-    _status = AuthStatus.loading;
-    notifyListeners();
-
-    try {
-      // TODO: Implement fetch user API call here
-      await Future.delayed(Duration(seconds: 2));
-      // Simulate fetching user profile
-      _status = AuthStatus.loaded;
-      notifyListeners();
-    } catch (e) {
-      _status = AuthStatus.error;
-      _errorMessage = e.toString();
-      notifyListeners();
-    }
-  }
 }

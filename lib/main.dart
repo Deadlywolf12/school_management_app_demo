@@ -8,6 +8,7 @@ import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:responsive_framework/utils/scroll_behavior.dart';
 import 'package:school_management_demo/provider/attendence_pro.dart';
 import 'package:school_management_demo/provider/auth_pro.dart';
+import 'package:school_management_demo/provider/classes_pro.dart';
 import 'package:school_management_demo/provider/employee_pro.dart';
 import 'package:school_management_demo/provider/parent_student_pro.dart';
 import 'package:school_management_demo/provider/subjects_pro.dart';
@@ -37,6 +38,7 @@ void main() async {
         ChangeNotifierProvider<AttendanceProvider>(create: (_) => AttendanceProvider()),
         ChangeNotifierProvider<SubjectsProvider>(create: (_) => SubjectsProvider()),
         ChangeNotifierProvider<ParentStudentProvider>(create: (_) => ParentStudentProvider()),
+        ChangeNotifierProvider<ClassesProvider>(create: (_) => ClassesProvider()),
             ChangeNotifierProvider(
           create: (_) => QuickActionsProvider()..loadSelectedActions(),
         ),

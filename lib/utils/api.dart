@@ -234,15 +234,15 @@ class Examinations {
 class Grading {
   static Api api = Api();
   
-  String updateClassSubjects = "${api.base}grading/class-subjects";
-  String addGrade = "${api.base}grading/add-grade";
+  String updateClassSubjects = "${api.base}grades/class-subjects";
+  String addGrade = "${api.base}grades/add-grade";
   
   String getClassSubjects(int classNumber) {
-    return "${api.base}grading/class-subjects/$classNumber";
+    return "${api.base}grades/class-subjects/$classNumber";
   }
   
   String getStudentGrade(String studentId, {int? classNumber, int? year}) {
-    String url = "${api.base}grading/student-grade/$studentId";
+    String url = "${api.base}grades/student-grade/$studentId";
     List<String> params = [];
     if (classNumber != null) params.add("classNumber=$classNumber");
     if (year != null) params.add("year=$year");
