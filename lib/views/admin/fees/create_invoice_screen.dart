@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management_demo/models/fee_model.dart';
-import 'package:school_management_demo/provider/fee_provider.dart';
-import 'package:school_management_demo/provider/user_pro.dart';
+import 'package:school_management_demo/provider/employee_pro.dart';
+import 'package:school_management_demo/provider/fee_pro.dart';
+
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -40,7 +41,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
   void _loadData() {
     final feeProvider = context.read<FeeProvider>();
-    final userProvider = context.read<UserProvider>();
+    final userProvider = context.read<FacultyProvider>();
     
     // Load fee structures if not loaded
     if (feeProvider.feeStructures == null || feeProvider.feeStructures!.isEmpty) {
@@ -52,15 +53,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     }
     
     // Load students if not loaded
-    if (userProvider.studentsList == null || userProvider.studentsList!.isEmpty) {
-      userProvider.fetchAllUsers(role: 'student', context: context).then((result) {
-        if (result != 'true' && mounted) {
-          SnackBarHelper.showError(result);
-        }
-      });
-    }
-  }
-
+    if (userProvider.students == null || userProvider.students!.isEmpty) {
+      userProvider.fetchFaculty(role: 'student', context: context);
+  }}
   void _createInvoice() async {
     if (!_formKey.currentState!.validate()) return;
     
@@ -133,10 +128,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         title: const Text('Create Invoice'),
         centerTitle: true,
       ),
-      body: Consumer2<FeeProvider, UserProvider>(
+      body: Consumer2<FeeProvider, FacultyProvider>(
         builder: (context, feeProvider, userProvider, child) {
           final feeStructures = feeProvider.feeStructures ?? [];
-          final students = userProvider.studentsList ?? [];
+          final students = userProvider.students ?? [];
           final filteredStructures = _getFilteredFeeStructures(feeStructures);
 
           return SingleChildScrollView(
@@ -239,13 +234,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(structure.name),
-                            Text(
-                              '\$${structure.baseAmount.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppTheme.lightGrey,
-                              ),
-                            ),
+                            // Text(
+                            //   '\$${structure.baseAmount.toStringAsFixed(2)}',
+                            //   style: TextStyle(
+                            //     fontSize: 12,
+                            //     color: AppTheme.lightGrey,
+                            //   ),
+                            // ),
                           ],
                         ),
                       );

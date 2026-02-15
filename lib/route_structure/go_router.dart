@@ -1,7 +1,3 @@
-
-
-
-
 import 'package:go_router/go_router.dart';
 import 'package:school_management_demo/models/classes_model.dart';
 import 'package:school_management_demo/models/emp_model.dart';
@@ -16,6 +12,14 @@ import 'package:school_management_demo/views/admin/exams/exam_schedule_details.d
 import 'package:school_management_demo/views/admin/exams/examination_details.dart';
 import 'package:school_management_demo/views/admin/exams/examinations_dashboard.dart';
 import 'package:school_management_demo/views/admin/exams/student_exam_report.dart';
+import 'package:school_management_demo/views/admin/fees/apply_disc_fee_screen.dart';
+import 'package:school_management_demo/views/admin/fees/apply_fine_fee_screen.dart';
+import 'package:school_management_demo/views/admin/fees/create_invoice_screen.dart';
+import 'package:school_management_demo/views/admin/fees/fee_management_dashboard.dart';
+import 'package:school_management_demo/views/admin/fees/invoice_details_screen.dart';
+import 'package:school_management_demo/views/admin/fees/payment_history_screen.dart';
+import 'package:school_management_demo/views/admin/fees/record_payment_screen.dart';
+import 'package:school_management_demo/views/admin/fees/student_fee_details_screen.dart';
 import 'package:school_management_demo/views/admin/salary/add_bonus_screen.dart';
 import 'package:school_management_demo/views/admin/salary/add_deduction_screen.dart';
 import 'package:school_management_demo/views/admin/salary/adjust_salary_screen.dart';
@@ -26,7 +30,10 @@ import 'package:school_management_demo/views/admin/salary/process_salary_payment
 import 'package:school_management_demo/views/admin/salary/salary_adjustments_history.dart';
 import 'package:school_management_demo/views/admin/salary/salary_management_dashboard.dart';
 import 'package:school_management_demo/views/admin/salary/salary_records_list.dart';
+import 'package:school_management_demo/views/attendence/attandance_dashboard.dart';
 import 'package:school_management_demo/views/attendence/attendence.dart';
+import 'package:school_management_demo/views/attendence/bulk_attandace.dart';
+import 'package:school_management_demo/views/attendence/my_attendence.dart';
 
 import 'package:school_management_demo/views/auth/forgot_pass.dart';
 import 'package:school_management_demo/views/auth/otp_screen.dart';
@@ -89,6 +96,7 @@ class MyRouter {
 
    static const String examinationsDashboard = '/examinations-dashboard';
   static const String createExamination = '/create-examination';
+  static const String myAttendance = '/my-attendance';
   static const String examinationDetails = '/examination-details';
   static const String createExamSchedule = '/create-exam-schedule';
   static const String examScheduleDetails = '/exam-schedule-details';
@@ -109,7 +117,19 @@ class MyRouter {
   static const String processSalaryPayment = '/process-salary-payment';
   static const String salaryRecordsList = '/salary-records-list';
   static const String salaryAdjustmentsHistory = '/salary-adjustments-history';
+  static const String attendanceDashboard = '/attendanceDashboard';
+static const String markBulkAttendance = '/markBulkAttendance';
 
+
+
+static const String feeManagementDashboard = '/feeManagementDashboard';
+static const String createInvoice = '/createInvoice';
+static const String invoiceDetails = '/invoiceDetails';
+static const String applyDiscount = '/applyDiscount';
+static const String applyFine = '/applyFine';
+static const String recordPayment = '/recordPayment';
+static const String studentFeeDetails = '/studentFeeDetails';
+static const String paymentHistory = '/paymentHistory';
 
   static final GoRouter router = GoRouter(
     initialLocation: '/$splash',
@@ -186,20 +206,16 @@ class MyRouter {
           builder: (context, state) => const EditQuickButtons(),
         ),
 
-   GoRoute(
-  path: '/$attendance',
+GoRoute(
+  path: '/attendance',  // Remove :userId
   name: attendance,
   builder: (context, state) {
     final extra = state.extra as Map<String, dynamic>?;
-
-    final userId = extra?["userId"] as String? ?? "";
-    final userName = extra?["userName"] as String? ?? "";
-    final userRole = extra?["userRole"] as String? ?? "";
-
     return AttendanceMarkingScreen(
-      userId: userId,
-      userName: userName,
-      userRole: userRole,
+      userId: extra?['userId'] ?? '',  // Get from extra
+      userName: extra?['userName'] ?? 'Unknown',
+      userRole: extra?['userRole'] ?? 'user',
+      isAdminView: extra?['isAdminView'] ?? false,
     );
   },
 ),
@@ -496,6 +512,117 @@ GoRoute(
   },
 ),
 
+
+// Fee Management Dashboard
+GoRoute(
+  path: feeManagementDashboard,
+  name: feeManagementDashboard,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+
+    return FeeManagementDashboard(
+    );
+  },
+),
+
+// Create Invoice
+GoRoute(
+  path: createInvoice,
+  name: createInvoice,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+
+    return CreateInvoiceScreen(
+    
+    );
+  },
+),
+
+// Invoice Details
+GoRoute(
+  path: invoiceDetails,
+  name: invoiceDetails,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final invoiceId = extra?['invoiceId'] as String;
+
+    return InvoiceDetailsScreen(
+          invoiceId: invoiceId,
+    );
+  },
+),
+
+// Apply Discount
+GoRoute(
+  path: applyDiscount,
+  name: applyDiscount,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final invoiceId = extra?['invoiceId'] as String; 
+
+    return ApplyDiscountScreen(
+      invoiceId: invoiceId,
+    );
+  },
+),
+
+// Apply Fine
+GoRoute(
+  path: applyFine,
+  name: applyFine,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final invoiceId = extra?['invoiceId'] as String;
+
+    return ApplyFineScreen(
+      invoiceId: invoiceId,
+    );
+  },
+),
+
+// Record Payment
+GoRoute(
+  path: recordPayment,
+  name: recordPayment,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final invoiceId = extra?['invoiceId'] as String?;
+
+    return RecordPaymentScreen(
+      invoiceId: invoiceId,
+      
+    );
+  },
+),
+
+// Student Fee Details
+GoRoute(
+  path: studentFeeDetails,
+  name: studentFeeDetails,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final studentId = extra?['studentId'] as String?;
+
+    return StudentFeeDetailsScreen(
+      studentId: studentId,
+   
+    );
+  },
+),
+
+// Payment History
+GoRoute(
+  path: paymentHistory,
+  name: paymentHistory,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+
+    return PaymentHistoryScreen(
+    
+    );
+  },
+),
+
 GoRoute(
   path: studentExamReport,
   name: studentExamReport,
@@ -522,7 +649,24 @@ GoRoute(
     );
   },
 ),
-   
+   GoRoute(
+  path: attendanceDashboard,
+  name: attendanceDashboard,
+  builder: (context, state) => const AttendanceDashboard(),
+),
+
+
+GoRoute(
+  path: '/my-attendance',
+  name: MyRouter.myAttendance,
+  builder: (context, state) => const MyAttendanceScreen(),
+),
+
+GoRoute(
+  path: markBulkAttendance,
+  name: markBulkAttendance,
+  builder: (context, state) => const MarkBulkAttendanceScreen(),
+),
 GoRoute(
   path:examScheduleDetails,
   name: examScheduleDetails,

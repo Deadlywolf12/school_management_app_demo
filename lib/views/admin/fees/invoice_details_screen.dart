@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management_demo/models/fee_model.dart';
-import 'package:school_management_demo/provider/fee_provider.dart';
+import 'package:school_management_demo/provider/fee_pro.dart';
 import 'package:school_management_demo/route_structure/go_navigator.dart';
 import 'package:school_management_demo/route_structure/go_router.dart';
 import 'package:school_management_demo/theme/colors.dart';

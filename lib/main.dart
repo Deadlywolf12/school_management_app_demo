@@ -11,6 +11,7 @@ import 'package:school_management_demo/provider/auth_pro.dart';
 import 'package:school_management_demo/provider/classes_pro.dart';
 import 'package:school_management_demo/provider/employee_pro.dart';
 import 'package:school_management_demo/provider/exam_pro.dart';
+import 'package:school_management_demo/provider/fee_pro.dart';
 import 'package:school_management_demo/provider/parent_student_pro.dart';
 import 'package:school_management_demo/provider/salary_pro.dart';
 import 'package:school_management_demo/provider/subjects_pro.dart';
@@ -42,6 +43,7 @@ void main() async {
         ChangeNotifierProvider<ParentStudentProvider>(create: (_) => ParentStudentProvider()),
         ChangeNotifierProvider<ClassesProvider>(create: (_) => ClassesProvider()),
         ChangeNotifierProvider<SalaryProvider>(create: (_) => SalaryProvider()),
+        ChangeNotifierProvider<FeeProvider>(create: (_) => FeeProvider()),
         ChangeNotifierProvider<ExaminationsProvider>(create: (_) => ExaminationsProvider()),
             ChangeNotifierProvider(
           create: (_) => QuickActionsProvider()..loadSelectedActions(),

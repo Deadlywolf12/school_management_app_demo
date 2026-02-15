@@ -3,9 +3,9 @@ import 'package:school_management_demo/helper/catch_helper.dart';
 import 'package:school_management_demo/helper/function_helper.dart';
 import 'package:school_management_demo/helper/token_expired_dialoge.dart';
 import 'package:school_management_demo/models/attendence_model.dart';
-
 import 'package:school_management_demo/utils/api.dart';
 import 'package:school_management_demo/utils/helper/shared_preferences/preference_helper.dart';
+import 'package:intl/intl.dart';
 
 enum AttendanceLoadingState { initial, loading, loaded, error }
 
@@ -56,7 +56,7 @@ class AttendanceProvider extends ChangeNotifier {
   Future<void> fetchMonthlyAttendance({
     required String userId,
     DateTime? month,
-   required BuildContext context
+    required BuildContext context
   }) async {
     try {
       _state = AttendanceLoadingState.loading;
@@ -94,21 +94,19 @@ class AttendanceProvider extends ChangeNotifier {
         _state = AttendanceLoadingState.loaded;
         _errorMessage = null;
       } else {
-          if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
-   
-        _state = AttendanceLoadingState.loaded;
-        _errorMessage = 'session expired';
-        notifyListeners();
-         WidgetsBinding.instance.addPostFrameCallback((_) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, 
-      builder: (_) => const TokenExpiredDialoge(),
-    );
-  });
-
-        return;
-      }
+        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token') {
+          _state = AttendanceLoadingState.loaded;
+          _errorMessage = 'session expired';
+          notifyListeners();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false, 
+              builder: (_) => const TokenExpiredDialoge(),
+            );
+          });
+          return;
+        }
       
         _handleError(response['message'] ?? 'Failed to load attendance');
       }
@@ -118,6 +116,79 @@ class AttendanceProvider extends ChangeNotifier {
       _state = AttendanceLoadingState.error;
       _errorMessage = getFriendlyErrorMessage(e);
       notifyListeners();
+    }
+  }
+
+  /// Mark or update attendance for a single user
+  Future<bool> markAttendance({
+    required String userId,
+    required String role,
+    required DateTime date,
+    required AttendanceStatus status,
+    required BuildContext context,
+    String? remarks,
+    DateTime? checkInTime,
+    DateTime? checkOutTime,
+  }) async {
+    try {
+      final prefs = await SharedPrefHelper.getInstance();
+      final token = prefs.getToken();
+      final markedBy = prefs.getUserId();
+
+      // API call: POST /attendance/mark
+      final request = {
+        'userId': userId,
+        'role': role,
+        'date': DateFormat('yyyy-MM-dd').format(date),
+        'status': status.name,
+        if (remarks != null) 'remarks': remarks,
+        if (checkInTime != null) 'checkInTime': checkInTime.toIso8601String(),
+        if (checkOutTime != null) 'checkOutTime': checkOutTime.toIso8601String(),
+        // Only include markedBy if it's not null and not empty
+        if (markedBy != null && markedBy.isNotEmpty) 'markedBy': markedBy,
+      };
+
+      final response = await postFunction(
+        request,
+        '${Api().base}attendance/mark',
+        authorization: true,
+        tokenKey: token,
+      );
+
+      if (response['success'] == true) {
+        // Update local cache if this is the current user
+        if (userId == _currentUserId) {
+          final key = DateTime(date.year, date.month, date.day);
+          final data = response['data'];
+          
+          _attendanceMap[key] = AttendanceRecord.fromJson(data);
+          _updateStats();
+          notifyListeners();
+        }
+        
+        return true;
+      } else {
+        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token') {
+          _errorMessage = 'session expired';
+          notifyListeners();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false, 
+              builder: (_) => const TokenExpiredDialoge(),
+            );
+          });
+          return false;
+        }
+        
+        _errorMessage = response['message'] ?? 'Failed to mark attendance';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = getFriendlyErrorMessage(e);
+      notifyListeners();
+      return false;
     }
   }
 
@@ -148,7 +219,7 @@ class AttendanceProvider extends ChangeNotifier {
 
       final response = await putFunction(
         body: request.toJson(),
-       api:  '${Api().base}attendance/${record.id}',
+        api: '${Api().base}attendance/${record.id}',
         authorization: true,
         tokenKey: token,
       );
@@ -168,21 +239,20 @@ class AttendanceProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-           if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
-   
-        _state = AttendanceLoadingState.loaded;
-        _errorMessage = 'session expired';
-        notifyListeners();
-         WidgetsBinding.instance.addPostFrameCallback((_) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, 
-      builder: (_) => const TokenExpiredDialoge(),
-    );
-  });
-
-        return false;
-      }
+        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token') {
+          _state = AttendanceLoadingState.loaded;
+          _errorMessage = 'session expired';
+          notifyListeners();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false, 
+              builder: (_) => const TokenExpiredDialoge(),
+            );
+          });
+          return false;
+        }
+        
         _errorMessage = response['message'] ?? 'Failed to update attendance';
         notifyListeners();
         return false;
@@ -191,6 +261,68 @@ class AttendanceProvider extends ChangeNotifier {
       _errorMessage = getFriendlyErrorMessage(e);
       notifyListeners();
       return false;
+    }
+  }
+
+  /// Mark attendance for multiple users at once
+  Future<Map<String, dynamic>> markBulkAttendance({
+    required List<Map<String, dynamic>> attendanceList,
+    required BuildContext context,
+  }) async {
+    try {
+      final prefs = await SharedPrefHelper.getInstance();
+      final token = prefs.getToken();
+      final markedBy = prefs.getUserId();
+
+      // API call: POST /attendance/mark-bulk
+      final request = {
+        'attendanceList': attendanceList,
+        // Only include markedBy if it's not null and not empty
+        if (markedBy != null && markedBy.isNotEmpty) 'markedBy': markedBy,
+      };
+
+      final response = await postFunction(
+        request,
+        '${Api().base}attendance/mark-bulk',
+        authorization: true,
+        tokenKey: token,
+      );
+
+      if (response['success'] == true) {
+        return {
+          'success': true,
+          'message': response['message'] ?? 'Bulk attendance marked successfully',
+          'summary': response['summary'],
+          'results': response['results'],
+        };
+      } else {
+        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token') {
+          _errorMessage = 'session expired';
+          notifyListeners();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false, 
+              builder: (_) => const TokenExpiredDialoge(),
+            );
+          });
+          
+          return {
+            'success': false,
+            'message': 'Session expired',
+          };
+        }
+        
+        return {
+          'success': false,
+          'message': response['message'] ?? 'Failed to mark bulk attendance',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': getFriendlyErrorMessage(e),
+      };
     }
   }
 
@@ -209,7 +341,7 @@ class AttendanceProvider extends ChangeNotifier {
       final prefs = await SharedPrefHelper.getInstance();
       final token = prefs.getToken();
 
-      // API call to report issue (you may need to create this endpoint)
+      // API call to report issue
       final request = ReportAttendanceRequest(
         date: date,
         reason: reason,
@@ -218,7 +350,7 @@ class AttendanceProvider extends ChangeNotifier {
 
       final response = await postFunction(
         request.toJson(),
-        'attendance/report-issue',
+        '${Api().base}attendance/report-issue',
         authorization: true,
         tokenKey: token,
       );

@@ -1,11 +1,15 @@
+// FIXED emp_model.dart - Added userId field
+
 class EmpUser {
-  final String id;
+  final String id;          // Primary key of the role table (teacher.id, student.id, etc)
+  final String userId;      // ✅ NEW: Foreign key to users table (teacher.userId, student.userId, etc)
   final String name;
   final String email;
   final String role;
 
   EmpUser({
     required this.id,
+    required this.userId,   // ✅ NEW: Required field
     required this.name,
     required this.email,
     required this.role,
@@ -14,6 +18,7 @@ class EmpUser {
   factory EmpUser.fromJson(Map<String, dynamic> json) {
     return EmpUser(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '', // ✅ NEW: Handle both camelCase and snake_case
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       role: json['role'] ?? '',
@@ -23,6 +28,7 @@ class EmpUser {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,     // ✅ NEW
       'name': name,
       'email': email,
       'role': role,
@@ -44,6 +50,7 @@ class Teacher extends EmpUser {
 
   Teacher({
     required super.id,
+    required super.userId,  // ✅ NEW: Pass to parent
     required super.name,
     required super.email,
     this.gender,
@@ -60,6 +67,7 @@ class Teacher extends EmpUser {
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '', // ✅ NEW
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       gender: json['gender'],
@@ -76,6 +84,7 @@ class Teacher extends EmpUser {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
@@ -105,6 +114,7 @@ class Staff extends EmpUser {
 
   Staff({
     required super.id,
+    required super.userId,  // ✅ NEW: Pass to parent
     required super.name,
     required super.email,
     this.gender,
@@ -120,6 +130,7 @@ class Staff extends EmpUser {
   factory Staff.fromJson(Map<String, dynamic> json) {
     return Staff(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '', // ✅ NEW
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       gender: json['gender'],
@@ -135,6 +146,7 @@ class Staff extends EmpUser {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
@@ -149,6 +161,7 @@ class Staff extends EmpUser {
     };
   }
 }
+
 // Student Model
 class Student extends EmpUser {
   final String? gender;
@@ -164,6 +177,7 @@ class Student extends EmpUser {
 
   Student({
     required super.id,
+    required super.userId,  // ✅ NEW: Pass to parent
     required super.name,
     required super.email,
     this.gender,
@@ -181,6 +195,7 @@ class Student extends EmpUser {
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '', // ✅ NEW
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       gender: json['gender'],
@@ -198,6 +213,7 @@ class Student extends EmpUser {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
@@ -224,6 +240,7 @@ class Parent extends EmpUser {
 
   Parent({
     required super.id,
+    required super.userId,  // ✅ NEW: Pass to parent
     required super.name,
     required super.email,
     required this.guardianName,
@@ -235,6 +252,7 @@ class Parent extends EmpUser {
   factory Parent.fromJson(Map<String, dynamic> json) {
     return Parent(
       id: json['id'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '', // ✅ NEW
       name: json['name'] ?? json['guardianName'] ?? '',
       email: json['email'] ?? '',
       guardianName: json['guardianName'] ?? json['name'] ?? '',
@@ -246,6 +264,7 @@ class Parent extends EmpUser {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
@@ -257,7 +276,7 @@ class Parent extends EmpUser {
   }
 }
 
-// API Response Model
+// API Response Model (unchanged)
 class FacultyResponse {
   final bool success;
   final String role;
@@ -294,7 +313,7 @@ class FacultyResponse {
         case 'parent':
           return Parent.fromJson(userJson);
         case 'admin':
-          return EmpUser.fromJson(userJson); // Admin uses base EmpUser
+          return EmpUser.fromJson(userJson);
         default:
           return EmpUser.fromJson(userJson);
       }

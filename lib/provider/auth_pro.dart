@@ -63,6 +63,7 @@ if (response['success'] != true) {
 
 await prefs.saveToken(_authResponse!.token);
 await prefs.saveRole(_authResponse!.user.role);
+await prefs.saveUserId(_authResponse!.user.id);
 final role = prefs.getRole();
 log(_authResponse!.token);
 log(role + ' from provider');

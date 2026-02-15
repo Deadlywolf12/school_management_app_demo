@@ -134,6 +134,7 @@ class Attendance {
   static Api api = Api();
   
   String markAttendance = "${api.base}attendance/mark";
+    
   String markBulkAttendance = "${api.base}attendance/mark-bulk";
   
   String getAttendance({
@@ -258,31 +259,33 @@ class Grading {
 }
 
 // ==================== FEES ====================
+
+
 class Fees {
   static Api api = Api();
   
-  String createMonthlyInvoice = "${api.base}admin/fees/invoices/monthly";
-  String createAnnualInvoice = "${api.base}admin/fees/invoices/annual";
-  String applyDiscount = "${api.base}admin/fees/discounts";
-  String applyFine = "${api.base}admin/fees/fines";
-  String recordPayment = "${api.base}admin/fees/payments";
-  String getPaymentHistory = "${api.base}admin/fees/payments/history";
-  String getDashboardStats = "${api.base}admin/fees/dashboard/stats";
+  String createMonthlyInvoice = "${api.base}payments/fees/invoices/monthly";
+  String createAnnualInvoice = "${api.base}payments/fees/invoices/annual";
+  String applyDiscount = "${api.base}payments/fees/discounts";
+  String applyFine = "${api.base}payments/fees/fines";
+  String recordPayment = "${api.base}payments/fees/payments";
+  String getPaymentHistory = "${api.base}payments/fees/payments/history";
+  String getDashboardStats = "${api.base}payments/fees/dashboard/stats";
   
   String getInvoiceById(String invoiceId) {
-    return "${api.base}admin/fees/invoices/$invoiceId";
+    return "${api.base}payments/fees/invoices/$invoiceId";
   }
   
   String cancelInvoice(String invoiceId) {
-    return "${api.base}admin/fees/invoices/$invoiceId/cancel";
+    return "${api.base}payments/fees/invoices/$invoiceId/cancel";
   }
   
   String getPaymentDetails(String paymentId) {
-    return "${api.base}admin/fees/payments/$paymentId";
+    return "${api.base}payments/fees/payments/$paymentId";
   }
   
   String getStudentFeeDetails(String studentId, {String? academicYear, String? status}) {
-    String url = "${api.base}admin/fees/students/$studentId";
+    String url = "${api.base}payments/fees/students/$studentId";
     List<String> params = [];
     if (academicYear != null) params.add("academicYear=$academicYear");
     if (status != null) params.add("status=$status");
@@ -291,7 +294,7 @@ class Fees {
   }
   
   String getStudentFeeHistory(String studentId, {int page = 1, int limit = 50}) {
-    return "${api.base}admin/fees/students/$studentId/history?page=$page&limit=$limit";
+    return "${api.base}payments/fees/students/$studentId/history?page=$page&limit=$limit";
   }
 }
 

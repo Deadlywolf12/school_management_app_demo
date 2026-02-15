@@ -36,67 +36,55 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   void _handleActionTap(QuickActionItem action) {
     // Navigate based on action ID
     switch (action.id) {
+      
+      case 'manage_parents':
+        Go.named(context, MyRouter.faculty, extra: "parent");
+       break;
+      
+      case 'manage_staff':
+        Go.named(context, MyRouter.faculty, extra: "staff");
+       break;
       case 'manage_teachers':
         Go.named(context, MyRouter.faculty);
         break;
       case 'manage_students':
-          Go.named(context, MyRouter.faculty,extra: "student");
-     
-   
+        Go.named(context, MyRouter.faculty, extra: "student");
         break;
       case 'manage_fees':
-        // Go.named(context, MyRouter.manageFees);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Manage Fees - Coming soon!')),
-        );
+        Go.named(context, MyRouter.feeManagementDashboard);
         break;
       case 'manage_attendance':
-        Go.named(
-          context,
-          MyRouter.attendance,
-          extra: {
-            "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
-            "userName": "John Doe",
-            "userRole": "teacher",
-          },
-        );
+        // Navigate to attendance dashboard where admin can select users
+        Go.named(context, MyRouter.attendanceDashboard);
         break;
       case 'manage_classes':
         Go.named(context, MyRouter.manageClasses);
-       
         break;
       case 'manage_subjects':
         Go.named(context, MyRouter.subjects);
-      
         break;
       case 'manage_exams':
         Go.named(context, MyRouter.examinationsDashboard);
-    
         break;
       case 'manage_grades':
-        // Go.named(context, MyRouter.manageGrades);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Manage Grades - Coming soon!')),
         );
         break;
       case 'manage_salary':
         Go.named(context, MyRouter.salaryManagementDashboard);
-      
         break;
       case 'reports':
-        // Go.named(context, MyRouter.reports);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Reports - Coming soon!')),
         );
         break;
       case 'settings':
-        // Go.named(context, MyRouter.settings);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Settings - Coming soon!')),
         );
         break;
       case 'notifications':
-        // Go.named(context, MyRouter.notifications);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Notifications - Coming soon!')),
         );
@@ -207,7 +195,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                       Go.named(context, MyRouter.faculty,extra: "student");
+                        Go.named(context, MyRouter.faculty, extra: "student");
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,
@@ -332,16 +320,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        // Navigate to attendance screen
-                        Go.named(
-                          context,
-                          MyRouter.attendance,
-                          extra: {
-                            "userId": "97108ae7-42fc-4091-af76-b4e0fb3d285a",
-                            "userName": "John Doe",
-                            "userRole": "teacher",
-                          },
-                        );
+                        // Navigate to attendance dashboard
+                        Go.named(context, MyRouter.attendanceDashboard);
                       },
                       child: FilledBox(
                         color: Theme.of(context).cardColor,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:school_management_demo/theme/colors.dart';
+import 'package:school_management_demo/views/admin/employees/employees_list.dart';
 import 'package:school_management_demo/views/admin/home/admin_dashboard.dart';
+import 'package:school_management_demo/views/admin/manage_opt_screen.dart';
 
 // Import your dashboards and settings
 
@@ -41,9 +43,9 @@ class _NavigationHandlerState extends State<NavigationHandler> {
       case "admin":
         return  [
           AdminHomeScreen(),
-          AdminHomeScreen(), // replace with AnalyticsScreen if exists
-          AdminHomeScreen(), // replace with AddScreen if exists
-          AdminHomeScreen(), // replace with LoansScreen if exists
+          ManagementOptionsScreen(), 
+          FacultyDirectoryScreen(), 
+    
           SettingsScreen(),
         ];
       case "teacher":
@@ -80,9 +82,9 @@ class _NavigationHandlerState extends State<NavigationHandler> {
       case "admin":
         return  [
           _NavItem(LucideIcons.home, "Home"),
-          _NavItem(LucideIcons.barChart2, "Analytics"),
-          _NavItem(LucideIcons.plus, "Add"),
-          _NavItem(LucideIcons.wallet2, "Loans"),
+          _NavItem(LucideIcons.edit, "Manage"),
+          _NavItem(LucideIcons.user, "Users"),
+        
           _NavItem(LucideIcons.settings2, "Settings"),
         ];
       case "teacher":
