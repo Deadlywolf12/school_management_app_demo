@@ -16,7 +16,7 @@ import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:school_management_demo/widgets/custom_button.dart';
 import 'package:school_management_demo/widgets/snackbar.dart';
-import 'package:school_management_demo/views/selector/generic_selector.dart';
+import 'package:school_management_demo/views/admin/selector/generic_selector.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final String classId;

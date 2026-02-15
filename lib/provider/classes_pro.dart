@@ -26,6 +26,10 @@ class ClassesProvider extends ChangeNotifier {
  
   ClassResponse? _classResponse;
   List<SchoolClass>? get getListOfClasses => _classResponse?.data;
+  
+  // ✅ NEW: Single class data (for bulk marking, exam schedules etc.)
+  SchoolClass? _singleClass;
+  SchoolClass? get getSingleClass => _singleClass;
  
 
  
@@ -41,9 +45,9 @@ class ClassesProvider extends ChangeNotifier {
   bool get hasError => _status == ClassesStatus.error;
   bool get isEmpty => _classResponse?.data.isEmpty ?? true && isLoaded;
 
-  /// Fetch subject
+  /// Fetch all classes
 
-  Future<void> fetchAllClasses({required BuildContext context}) async {
+  Future<void> fetchAllClasses({required BuildContext context, String? classNumber}) async {
     try {
   
       _status = ClassesStatus.loading;
@@ -51,8 +55,12 @@ class ClassesProvider extends ChangeNotifier {
       final prefs = await SharedPrefHelper.getInstance();
       final token = prefs.getToken();
       // Make API call
+
+      final api = classNumber != null
+          ? "${Api.classes.getAllClasses}?classNumber=$classNumber"
+          : Api.classes.getAllClasses;
       final response = await getFunction(
-        Api.classes.getAllClasses,
+        api,
         authorization: true,
         tokenKey: token,
       );
@@ -89,6 +97,65 @@ class ClassesProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _handleException(e);
+    }
+  }
+
+  // ✅ NEW: Fetch a single class by classId
+  Future<String> fetchSingleClass({
+    required String classId,
+    required BuildContext context,
+  }) async {
+    try {
+      final prefs = await SharedPrefHelper.getInstance();
+      final token = prefs.getToken();
+
+      final response = await getFunction(
+        Api.classes.getClassById(classId),
+        authorization: true,
+        tokenKey: token,
+      );
+
+      if (response['msg'] == 'User not found' ||
+          response['msg'] == 'Token Expired' ||
+          response['msg'] == 'Invalid token') {
+        _status = ClassesStatus.loaded;
+        _errorMessage = 'session expired';
+        notifyListeners();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const TokenExpiredDialoge(),
+          );
+        });
+
+        return errorMessage ?? "Session Expired";
+      }
+
+      if (!_isSuccessResponse(response)) {
+        return response['message'] ?? 'An unknown error occured';
+      }
+
+      // Store single class data
+      _singleClass = SchoolClass.fromJson(response['data'] ?? {});
+      _errorMessage = null;
+      notifyListeners();
+      
+      return 'true';
+    } catch (e) {
+      _handleException(e);
+      return errorMessage ?? "An unknown error occured";
+    }
+  }
+
+  // ✅ NEW: Get class by ID from cache (if already fetched)
+  SchoolClass? getClassById(String classId) {
+    if (_classResponse?.data == null) return null;
+    
+    try {
+      return _classResponse!.data.firstWhere((c) => c.id == classId);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -488,7 +555,7 @@ Future<String> updateClassSubj({
           context: context,
           barrierDismissible: false,
           builder: (_) => const TokenExpiredDialoge(),
-        );
+          );
       });
     // --- handle response ---
     if (!_isSuccessResponse(response)) {
@@ -543,6 +610,7 @@ Future<String> updateClassSubj({
     _status = ClassesStatus.initial;
     _errorMessage = null;
     _classResponse = null;
+    _singleClass = null;
  
     notifyListeners();
   }

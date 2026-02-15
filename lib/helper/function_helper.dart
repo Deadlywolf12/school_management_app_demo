@@ -34,11 +34,13 @@ Map<String, String> _buildHeaders({
 /// --------------------------------------------
 /// GET
 /// --------------------------------------------
+/// 
 Future<dynamic> getFunction(
   String api, {
   bool authorization = false,
   String? tokenKey,
   Map<String, String>? header,
+  Map<String, String>? queryParams, // Add this optional parameter
 }) async {
   final headers = _buildHeaders(
     authorization: authorization,
@@ -48,12 +50,28 @@ Future<dynamic> getFunction(
   );
 
   try {
+    // Build URI with query parameters
+    final uri = Uri.parse(api);
+    
+    // Add query parameters if provided
+    final Uri finalUri;
+    if (queryParams != null && queryParams.isNotEmpty) {
+      finalUri = uri.replace(
+        queryParameters: {
+          ...uri.queryParameters,
+          ...queryParams,
+        },
+      );
+    } else {
+      finalUri = uri;
+    }
+
     final response = await http.get(
-      Uri.parse(api),
+      finalUri,
       headers: headers.isEmpty ? null : headers,
     );
 
-    log("GET => $api");
+    log("GET => $finalUri");
     log("HEADERS => $headers");
     log("RESPONSE => ${response.body}");
 
@@ -63,7 +81,6 @@ Future<dynamic> getFunction(
     return Future.error(e);
   }
 }
-
 /// --------------------------------------------
 /// POST
 /// --------------------------------------------

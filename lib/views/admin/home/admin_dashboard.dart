@@ -63,19 +63,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         break;
       case 'manage_classes':
         Go.named(context, MyRouter.manageClasses);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Manage Classes - Coming soon!')),
-        );
+       
         break;
       case 'manage_subjects':
         Go.named(context, MyRouter.subjects);
       
         break;
       case 'manage_exams':
-        // Go.named(context, MyRouter.manageExams);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Manage Exams - Coming soon!')),
-        );
+        Go.named(context, MyRouter.examinationsDashboard);
+    
         break;
       case 'manage_grades':
         // Go.named(context, MyRouter.manageGrades);
@@ -84,10 +80,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         );
         break;
       case 'manage_salary':
-        // Go.named(context, MyRouter.manageSalary);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Manage Salary - Coming soon!')),
-        );
+        Go.named(context, MyRouter.salaryManagementDashboard);
+      
         break;
       case 'reports':
         // Go.named(context, MyRouter.reports);

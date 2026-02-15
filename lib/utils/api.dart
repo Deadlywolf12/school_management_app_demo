@@ -1,7 +1,7 @@
 // api.dart - Complete API endpoints for School Management System
 
 class Api {
-  String base = "http://192.168.0.106:8000/api/v1/";
+  String base = "http://192.168.0.107:8000/api/v1/";
  
   // String base = "https://your-domain.com/api/v1/";
   
@@ -15,6 +15,8 @@ class Api {
   static Fees fees = Fees();
   static Salary salary = Salary();
   static ParentStudent parentStudent = ParentStudent();
+
+  
 }
 
 // ==================== AUTHENTICATION ====================
@@ -183,50 +185,50 @@ class Attendance {
 class Examinations {
   static Api api = Api();
   
-  String createExamination = "${api.base}examinations";
-  String getAllExaminations = "${api.base}examinations";
-  String getExamResults = "${api.base}examinations/results";
+  String createExamination = "${api.base}exams";
+  String getAllExaminations = "${api.base}exams";
+  String getExamResults = "${api.base}exams/results";
   
   String createExamSchedule(String examinationId) {
-    return "${api.base}examinations/$examinationId/schedule";
+    return "${api.base}exams/$examinationId/schedule";
   }
   
   String bulkCreateExamSchedules(String examinationId) {
-    return "${api.base}examinations/$examinationId/schedule-bulk";
+    return "${api.base}exams/$examinationId/schedule-bulk";
   }
   
-  String bulkMarkStudents = "${api.base}examinations/mark-bulk";
+  String bulkMarkStudents = "${api.base}exams/mark-bulk";
   
   String getExamSchedules(String examinationId) {
-    return "${api.base}examinations/$examinationId/schedules";
+    return "${api.base}exams/$examinationId/schedules";
   }
   
   String getStudentExamReport(String studentId) {
-    return "${api.base}examinations/report/$studentId";
+    return "${api.base}exams/report/$studentId";
   }
   
   String getClassExamSummary(String classId) {
-    return "${api.base}examinations/class-summary/$classId";
+    return "${api.base}exams/class-summary/$classId";
   }
   
   String updateExamination(String examinationId) {
-    return "${api.base}examinations/$examinationId";
+    return "${api.base}exams/$examinationId";
   }
   
   String updateExamSchedule(String scheduleId) {
-    return "${api.base}examinations/schedule/$scheduleId";
+    return "${api.base}exams/schedule/$scheduleId";
   }
   
   String updateStudentMark(String resultId) {
-    return "${api.base}examinations/result/$resultId";
+    return "${api.base}exams/result/$resultId";
   }
   
   String deleteExamination(String examinationId) {
-    return "${api.base}examinations/$examinationId";
+    return "${api.base}exams/$examinationId";
   }
   
   String deleteExamSchedule(String scheduleId) {
-    return "${api.base}examinations/schedule/$scheduleId";
+    return "${api.base}exams/schedule/$scheduleId";
   }
 }
 

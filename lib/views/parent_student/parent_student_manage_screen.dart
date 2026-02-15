@@ -7,7 +7,7 @@ import 'package:school_management_demo/provider/generic_selector_pro.dart';
 import 'package:school_management_demo/provider/parent_student_pro.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
-import 'package:school_management_demo/views/selector/generic_selector.dart';
+import 'package:school_management_demo/views/admin/selector/generic_selector.dart';
 import 'package:school_management_demo/models/selectable_item.dart'; // You need to create this
 
 class ManageParentStudentScreen extends StatefulWidget {

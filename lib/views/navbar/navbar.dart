@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:school_management_demo/theme/colors.dart';
-import 'package:school_management_demo/views/home/admin/admin_dashboard.dart';
+import 'package:school_management_demo/views/admin/home/admin_dashboard.dart';
 
 // Import your dashboards and settings
 
