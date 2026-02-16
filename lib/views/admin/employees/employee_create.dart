@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:school_management_demo/models/classes_model.dart';
 import 'package:school_management_demo/models/subjects_model.dart';
 import 'package:school_management_demo/models/user_account_models.dart';
+import 'package:school_management_demo/provider/classes_pro.dart';
 import 'package:school_management_demo/provider/subjects_pro.dart';
 import 'package:school_management_demo/provider/user_registration_provider.dart';
 import 'package:school_management_demo/theme/colors.dart';
@@ -22,12 +24,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   // Primary color
   static const Color primaryColor = Color(0xFF77CED9);
 
-
-@override
+  @override
   void initState() {
-   
     super.initState();
-    fetchSubjects();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchSubjects();
+      fetchClasses();
+    });
   }
 
   // Controllers for common fields
@@ -47,7 +50,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   final _teacherPhoneController = TextEditingController();
   final _teacherAddressController = TextEditingController();
   final _salaryController = TextEditingController();
-  final _classTeacherController = TextEditingController();
 
   // Controllers for Staff
   final _staffNameController = TextEditingController();
@@ -66,8 +68,8 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   String _selectedRole = 'student';
   String? _selectedGender;
   String? _selectedDepartment;
-  String? _selectedClass;
-  Subject? _selectedSubject;
+  SchoolClass? _selectedClass; // ✅ Changed to SchoolClass object
+  Subject? _selectedSubject; // ✅ Already correct
   String? _selectedBloodGroup;
   DateTime? _dateOfBirth;
   DateTime? _joiningDate;
@@ -86,12 +88,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     'Administration',
     'Finance',
     'Maintenance',
-  ];
-  final List<String> _classes = [
-    '1-A', '1-B', '2-A', '2-B', '3-A', '3-B',
-    '4-A', '4-B', '5-A', '5-B', '6-A', '6-B',
-    '7-A', '7-B', '8-A', '8-B', '9-A', '9-B',
-    '10-A', '10-B', '11-A', '11-B', '12-A', '12-B',
   ];
   
   final List<String> _bloodGroups = [
@@ -117,7 +113,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     _teacherPhoneController.dispose();
     _teacherAddressController.dispose();
     _salaryController.dispose();
-    _classTeacherController.dispose();
     _staffNameController.dispose();
     _staffEmployeeIdController.dispose();
     _staffPhoneController.dispose();
@@ -142,7 +137,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     _teacherPhoneController.clear();
     _teacherAddressController.clear();
     _salaryController.clear();
-    _classTeacherController.clear();
     _staffNameController.clear();
     _staffEmployeeIdController.clear();
     _staffPhoneController.clear();
@@ -217,7 +211,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       final studentDetails = StudentDetails(
         name: _studentNameController.text.trim(),
         studentId: _studentIdController.text.trim(),
-        classLevel: _selectedClass!,
+        classLevel: _selectedClass!.id, // ✅ Pass class ID
         enrollmentYear: int.parse(_enrollmentYearController.text.trim()),
         emergencyNumber: _emergencyNumberController.text.trim().isNotEmpty
             ? _emergencyNumberController.text.trim()
@@ -239,10 +233,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         name: _teacherNameController.text.trim(),
         employeeId: _teacherEmployeeIdController.text.trim(),
         department: _selectedDepartment!,
-        subject: _selectedSubject!.name  ,
-        classTeacher: _classTeacherController.text.trim().isNotEmpty
-            ? _classTeacherController.text.trim()
-            : null,
+        subject: _selectedSubject!.id, // ✅ Pass subject ID
         phoneNumber: _teacherPhoneController.text.trim(),
         address: _teacherAddressController.text.trim().isNotEmpty
             ? _teacherAddressController.text.trim()
@@ -410,41 +401,36 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     );
   }
 
+  bool _isLoading = false;
 
-bool _isLoading = false;
-
-  Future<void>fetchSubjects()async{
-
+  Future<void> fetchSubjects() async {
     setState(() {
-          _isLoading = true;
+      _isLoading = true;
     });
 
-    
-    final provider = Provider.of<SubjectsProvider>(listen: false,context);
-   final result =  await provider.fetchSubjectsForUserCreation(context: context);
+    final provider = Provider.of<SubjectsProvider>(context, listen: false);
+    final result = await provider.fetchSubjectsForUserCreation(context: context);
 
-    if(result){
+    if (result) {
       setState(() {
-          _isLoading = false;
-    });
-
-    }else{
+        _isLoading = false;
+      });
+    } else {
       _showErrorSnackBar("Failed to load subjects");
     }
+  }
 
+  Future<void> fetchClasses() async {
+    final provider = Provider.of<ClassesProvider>(context, listen: false);
+    await provider.fetchAllClasses(context: context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       appBar: AppBar(
-       
         elevation: 0,
-        title: const Text(
-          'Create User',
-          // style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Create User'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -487,7 +473,6 @@ bool _isLoading = false;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -560,7 +545,6 @@ bool _isLoading = false;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-       
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -587,7 +571,7 @@ bool _isLoading = false;
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: 'Email *',
-              labelStyle: TextStyle(color: AppTheme.primaryColor),
+              labelStyle: const TextStyle(color: AppTheme.primaryColor),
               prefixIcon: const Icon(Icons.email, color: primaryColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -613,7 +597,7 @@ bool _isLoading = false;
             obscureText: true,
             decoration: InputDecoration(
               labelText: 'Password *',
-                 labelStyle: TextStyle(color: AppTheme.primaryColor),
+              labelStyle: const TextStyle(color: AppTheme.primaryColor),
               prefixIcon: const Icon(Icons.lock, color: primaryColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -654,254 +638,258 @@ bool _isLoading = false;
   }
 
   Widget _buildStudentFields() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-    
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Consumer<ClassesProvider>(
+      builder: (context, classProvider, child) {
+        final classes = classProvider.getListOfClasses ?? [];
+        
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Student Details',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: primaryColor,
-            ),
-          ),
-          16.kH,
-          TextFormField(
-            controller: _studentNameController,
-            
-            decoration: _inputDecoration('Student Name *', Icons.person,),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Name is required' : null,
-                
-          ),
-          16.kH,
-          
-          TextFormField(
-            controller: _studentIdController,
-            decoration: _inputDecoration('Student ID *', Icons.badge),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Student ID is required' : null,
-          ),
-          16.kH,
-          DropdownButtonFormField<String>(
-            value: _selectedClass,
-            decoration: _inputDecoration('Class *', Icons.class_),
-            items: _classes.map((cls) {
-              return DropdownMenuItem(
-                value: cls,
-                child: Text(cls),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedClass = value),
-            validator: (value) => value == null ? 'Class is required' : null,
-          ),
-          16.kH,
-          TextFormField(
-            controller: _enrollmentYearController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: _inputDecoration('Enrollment Year *', Icons.calendar_today),
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return 'Enrollment year is required';
-              }
-              final year = int.tryParse(value!);
-              if (year == null || year < 2000 || year > DateTime.now().year) {
-                return 'Enter a valid year';
-              }
-              return null;
-            },
-          ),
-          16.kH,
-          DropdownButtonFormField<String>(
-            value: _selectedGender,
-            decoration: _inputDecoration('Gender', Icons.wc),
-            items: _genders.map((gender) {
-              return DropdownMenuItem(
-                value: gender,
-                child: Text(gender.toUpperCase()),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedGender = value),
-          ),
-          16.kH,
-          GestureDetector(
-            onTap: () => _selectDate(context, true),
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: _inputDecoration('Date of Birth', Icons.cake),
-                controller: TextEditingController(
-                  text: _dateOfBirth != null
-                      ? DateFormat('MMM dd, yyyy').format(_dateOfBirth!)
-                      : '',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Student Details',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
               ),
-            ),
+              16.kH,
+              TextFormField(
+                controller: _studentNameController,
+                decoration: _inputDecoration('Student Name *', Icons.person),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Name is required' : null,
+              ),
+              16.kH,
+              TextFormField(
+                controller: _studentIdController,
+                decoration: _inputDecoration('Student ID *', Icons.badge),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Student ID is required' : null,
+              ),
+              16.kH,
+              // ✅ Fixed: Class dropdown with SchoolClass objects
+              DropdownButtonFormField<SchoolClass>(
+                value: _selectedClass,
+                decoration: _inputDecoration('Class *', Icons.class_),
+                items: classes.map((cls) {
+                  return DropdownMenuItem(
+                    value: cls,
+                    child: Text('Class ${cls.classNumber} - ${cls.section}'),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedClass = value),
+                validator: (value) => value == null ? 'Class is required' : null,
+              ),
+              16.kH,
+              TextFormField(
+                controller: _enrollmentYearController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: _inputDecoration('Enrollment Year *', Icons.calendar_today),
+                validator: (value) {
+                  if (value?.trim().isEmpty ?? true) {
+                    return 'Enrollment year is required';
+                  }
+                  final year = int.tryParse(value!);
+                  if (year == null || year < 2000 || year > DateTime.now().year) {
+                    return 'Enter a valid year';
+                  }
+                  return null;
+                },
+              ),
+              16.kH,
+              DropdownButtonFormField<String>(
+                value: _selectedGender,
+                decoration: _inputDecoration('Gender', Icons.wc),
+                items: _genders.map((gender) {
+                  return DropdownMenuItem(
+                    value: gender,
+                    child: Text(gender.toUpperCase()),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedGender = value),
+              ),
+              16.kH,
+              GestureDetector(
+                onTap: () => _selectDate(context, true),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    decoration: _inputDecoration('Date of Birth', Icons.cake),
+                    controller: TextEditingController(
+                      text: _dateOfBirth != null
+                          ? DateFormat('MMM dd, yyyy').format(_dateOfBirth!)
+                          : '',
+                    ),
+                  ),
+                ),
+              ),
+              16.kH,
+              DropdownButtonFormField<String>(
+                value: _selectedBloodGroup,
+                decoration: _inputDecoration('Blood Group', Icons.bloodtype),
+                items: _bloodGroups.map((bg) {
+                  return DropdownMenuItem(
+                    value: bg,
+                    child: Text(bg),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedBloodGroup = value),
+              ),
+              16.kH,
+              TextFormField(
+                controller: _emergencyNumberController,
+                keyboardType: TextInputType.phone,
+                decoration: _inputDecoration('Emergency Number', Icons.phone),
+              ),
+              16.kH,
+              TextFormField(
+                controller: _studentAddressController,
+                maxLines: 3,
+                decoration: _inputDecoration('Address', Icons.location_on),
+              ),
+            ],
           ),
-          16.kH,
-          DropdownButtonFormField<String>(
-            value: _selectedBloodGroup,
-            decoration: _inputDecoration('Blood Group', Icons.bloodtype),
-            items: _bloodGroups.map((bg) {
-              return DropdownMenuItem(
-                value: bg,
-                child: Text(bg),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedBloodGroup = value),
-          ),
-          16.kH,
-          TextFormField(
-            controller: _emergencyNumberController,
-            keyboardType: TextInputType.phone,
-            decoration: _inputDecoration('Emergency Number', Icons.phone),
-          ),
-          16.kH,
-          TextFormField(
-            controller: _studentAddressController,
-            maxLines: 3,
-            decoration: _inputDecoration('Address', Icons.location_on),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildTeacherFields() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-       
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Teacher Details',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: primaryColor,
-            ),
-          ),
-          16.kH,
-          TextFormField(
-            controller: _teacherNameController,
-            decoration: _inputDecoration('Teacher Name *', Icons.person),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Name is required' : null,
-          ),
-          16.kH,
-          TextFormField(
-            controller: _teacherEmployeeIdController,
-            decoration: _inputDecoration('Employee ID *', Icons.badge),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Employee ID is required' : null,
-          ),
-          16.kH,
-          DropdownButtonFormField<String>(
-            value: _selectedDepartment,
-            decoration: _inputDecoration('Department *', Icons.business),
-            items: _departments.map((dept) {
-              return DropdownMenuItem(
-                value: dept,
-                child: Text(dept),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedDepartment = value),
-            validator: (value) => value == null ? 'Department is required' : null,
-          ),
-          16.kH,
-          DropdownButtonFormField<Subject>(
-            value: _selectedSubject,
-            decoration: _inputDecoration('Subject *', Icons.book),
-            items: Provider.of<SubjectsProvider>(listen: false,context).getListOfSubjects?.map((subj) {
-              return DropdownMenuItem(
-                value: subj,
-                child: Text(subj.name),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedSubject = value),
-            validator: (value) => value == null ? 'Subject is required' : null,
-          ),
-          16.kH,
-          TextFormField(
-            controller: _classTeacherController,
-            decoration: _inputDecoration('Class Teacher (Optional)', Icons.school),
-          ),
-          16.kH,
-          DropdownButtonFormField<String>(
-            value: _selectedGender,
-            decoration: _inputDecoration('Gender', Icons.wc),
-            items: _genders.map((gender) {
-              return DropdownMenuItem(
-                value: gender,
-                child: Text(gender.toUpperCase()),
-              );
-            }).toList(),
-            onChanged: (value) => setState(() => _selectedGender = value),
-          ),
-          16.kH,
-          TextFormField(
-            controller: _teacherPhoneController,
-            keyboardType: TextInputType.phone,
-            decoration: _inputDecoration('Phone Number *', Icons.phone),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Phone number is required' : null,
-          ),
-          16.kH,
-          GestureDetector(
-            onTap: () => _selectDate(context, false),
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: _inputDecoration('Joining Date *', Icons.calendar_month),
-                controller: TextEditingController(
-                  text: _joiningDate != null
-                      ? DateFormat('MMM dd, yyyy').format(_joiningDate!)
-                      : '',
-                ),
-                validator: (value) =>
-                    _joiningDate == null ? 'Joining date is required' : null,
+    return Consumer<SubjectsProvider>(
+      builder: (context, subjectProvider, child) {
+        final subjects = subjectProvider.getListOfSubjects ?? [];
+        
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
+            ],
           ),
-          16.kH,
-          TextFormField(
-            controller: _salaryController,
-            keyboardType: TextInputType.number,
-            decoration: _inputDecoration('Salary *', Icons.attach_money),
-            validator: (value) =>
-                value?.trim().isEmpty ?? true ? 'Salary is required' : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Teacher Details',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              16.kH,
+              TextFormField(
+                controller: _teacherNameController,
+                decoration: _inputDecoration('Teacher Name *', Icons.person),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Name is required' : null,
+              ),
+              16.kH,
+              TextFormField(
+                controller: _teacherEmployeeIdController,
+                decoration: _inputDecoration('Employee ID *', Icons.badge),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Employee ID is required' : null,
+              ),
+              16.kH,
+              DropdownButtonFormField<String>(
+                value: _selectedDepartment,
+                decoration: _inputDecoration('Department *', Icons.business),
+                items: _departments.map((dept) {
+                  return DropdownMenuItem(
+                    value: dept,
+                    child: Text(dept),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedDepartment = value),
+                validator: (value) => value == null ? 'Department is required' : null,
+              ),
+              16.kH,
+              // ✅ Fixed: Subject dropdown
+              DropdownButtonFormField<Subject>(
+                value: _selectedSubject,
+                decoration: _inputDecoration('Subject *', Icons.book),
+                items: subjects.map((subj) {
+                  return DropdownMenuItem(
+                    value: subj,
+                    child: Text(subj.name),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedSubject = value),
+                validator: (value) => value == null ? 'Subject is required' : null,
+              ),
+              16.kH,
+              DropdownButtonFormField<String>(
+                value: _selectedGender,
+                decoration: _inputDecoration('Gender', Icons.wc),
+                items: _genders.map((gender) {
+                  return DropdownMenuItem(
+                    value: gender,
+                    child: Text(gender.toUpperCase()),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedGender = value),
+              ),
+              16.kH,
+              TextFormField(
+                controller: _teacherPhoneController,
+                keyboardType: TextInputType.phone,
+                decoration: _inputDecoration('Phone Number *', Icons.phone),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Phone number is required' : null,
+              ),
+              16.kH,
+              GestureDetector(
+                onTap: () => _selectDate(context, false),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    decoration: _inputDecoration('Joining Date *', Icons.calendar_month),
+                    controller: TextEditingController(
+                      text: _joiningDate != null
+                          ? DateFormat('yyyy, MM, dd').format(_joiningDate!)
+                          : '',
+                    ),
+                    validator: (value) =>
+                        _joiningDate == null ? 'Joining date is required' : null,
+                  ),
+                ),
+              ),
+              16.kH,
+              TextFormField(
+                controller: _salaryController,
+                keyboardType: TextInputType.number,
+                decoration: _inputDecoration('Salary *', Icons.attach_money),
+                validator: (value) =>
+                    value?.trim().isEmpty ?? true ? 'Salary is required' : null,
+              ),
+              16.kH,
+              TextFormField(
+                controller: _teacherAddressController,
+                maxLines: 3,
+                decoration: _inputDecoration('Address', Icons.location_on),
+              ),
+            ],
           ),
-          16.kH,
-          TextFormField(
-            controller: _teacherAddressController,
-            maxLines: 3,
-            decoration: _inputDecoration('Address', Icons.location_on),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -909,7 +897,7 @@ bool _isLoading = false;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+     
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1016,7 +1004,7 @@ bool _isLoading = false;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+      
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1108,7 +1096,7 @@ bool _isLoading = false;
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-         labelStyle: TextStyle(color: AppTheme.primaryColor),
+      labelStyle: const TextStyle(color: AppTheme.primaryColor),
       prefixIcon: Icon(icon, color: primaryColor),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

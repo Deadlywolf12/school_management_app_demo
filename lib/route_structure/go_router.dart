@@ -11,7 +11,7 @@ import 'package:school_management_demo/views/admin/exams/exam_results_screen.dar
 import 'package:school_management_demo/views/admin/exams/exam_schedule_details.dart';
 import 'package:school_management_demo/views/admin/exams/examination_details.dart';
 import 'package:school_management_demo/views/admin/exams/examinations_dashboard.dart';
-import 'package:school_management_demo/views/admin/exams/student_exam_report.dart';
+import 'package:school_management_demo/views/student/exams/student_exam_report.dart';
 import 'package:school_management_demo/views/admin/fees/apply_disc_fee_screen.dart';
 import 'package:school_management_demo/views/admin/fees/apply_fine_fee_screen.dart';
 import 'package:school_management_demo/views/admin/fees/create_invoice_screen.dart';
@@ -47,8 +47,9 @@ import 'package:school_management_demo/views/admin/employees/employee_create.dar
 import 'package:school_management_demo/views/admin/employees/employees_list.dart';
 import 'package:school_management_demo/views/admin/employees/employees_details.dart';
 import 'package:school_management_demo/views/admin/home/others/quick_buttons.dart';
+import 'package:school_management_demo/views/student/fees/student_fee_screen.dart';
 
-import 'package:school_management_demo/views/home/student_dashboard.dart';
+import 'package:school_management_demo/views/student/student_dashboard.dart';
 
 import 'package:school_management_demo/views/landing/landing_screen.dart';
 import 'package:school_management_demo/views/navbar/navbar.dart';
@@ -129,6 +130,7 @@ static const String applyDiscount = '/applyDiscount';
 static const String applyFine = '/applyFine';
 static const String recordPayment = '/recordPayment';
 static const String studentFeeDetails = '/studentFeeDetails';
+static const String myFeeDetails = '/myFeeDetails';
 static const String paymentHistory = '/paymentHistory';
 
   static final GoRouter router = GoRouter(
@@ -286,17 +288,14 @@ GoRoute(
     return ClassDetailScreen(classId: classId,classNum: classNumber);
   },
       ),
-
-          GoRoute(
-        path: '/$classEditCreate',
-        name: classEditCreate,
-        
-        builder: (context, state) {
-    final schoolClass = state.extra as SchoolClass;
-    return ClassEditScreen(classData: schoolClass,);
+GoRoute(
+  path: '/$classEditCreate',
+  name: classEditCreate,
+  builder: (context, state) {
+    final schoolClass = state.extra as SchoolClass?;  
+    return ClassEditScreen(classData: schoolClass);  
   },
-      ),
-
+),
        GoRoute(
         path: '/$manageClasses',
         name: manageClasses,
@@ -405,6 +404,18 @@ GoRoute(
     final extra = state.extra as Map<String, dynamic>;
     return ProcessSalaryPayment(
       salaryRecord: extra['salaryRecord'] as SalaryRecord,
+    );
+  },
+),
+
+GoRoute(
+  path: myFeeDetails,
+  name: myFeeDetails,
+  builder: (context, state) {
+   
+    return StudentFeeScreen(
+   
+    
     );
   },
 ),

@@ -1,4 +1,6 @@
 
+import 'package:intl/intl.dart';
+
 class UserAccount {
   final String email;
   final String password;
@@ -52,7 +54,7 @@ class StudentDetails {
       if (emergencyNumber != null) 'emergencyNumber': emergencyNumber,
       if (address != null) 'address': address,
       if (bloodGroup != null) 'bloodGroup': bloodGroup,
-      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
+       if (dateOfBirth != null) 'dateOfBirth': DateFormat('yyyy-MM-dd').format(dateOfBirth!),
       if (gender != null) 'gender': gender,
     };
   }

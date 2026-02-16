@@ -879,7 +879,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
     Go.named(
       context,
       MyRouter.classEditCreate,
-      extra: {'schoolClass': classData},
+      extra: classData
     );
   }
 

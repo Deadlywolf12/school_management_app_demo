@@ -113,12 +113,20 @@ class SharedPrefHelper {
 static const String _tokenKey = 'auth_token';
 static const String _roleKey = 'user_role';
 static const String _userKey = 'user_id';
+static const String _userNameKey = 'user_name';
 
 Future<void> saveUserId(String userId) async {
   await putString(_userKey, userId);
 }
 String getUserId() {
   return getString(_userKey);
+}
+
+Future<void> saveUserName(String userName) async {
+  await putString(_userNameKey, userName);
+}
+String getUserName() {
+  return getString(_userNameKey);
 }
 
 Future<void> saveToken(String token) async {

@@ -5,13 +5,11 @@ import 'package:school_management_demo/models/classes_model.dart';
 import 'package:school_management_demo/models/selectable_item.dart';
 import 'package:school_management_demo/models/subjects_model.dart';
 import 'package:school_management_demo/provider/classes_pro.dart';
-
 import 'package:school_management_demo/provider/generic_selector_pro.dart';
 import 'package:school_management_demo/provider/subjects_pro.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/theme/spacing.dart';
 import 'package:school_management_demo/views/admin/selector/generic_selector.dart';
-
 import 'package:school_management_demo/widgets/snackbar.dart';
 
 class ClassEditScreen extends StatefulWidget {
@@ -30,13 +28,18 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
   final _formKey = GlobalKey<FormState>();
   static const Color primaryColor = AppTheme.primaryColor;
 
-  // Controllers
+  // ✅ ALL Controllers
   late TextEditingController _classNumberController;
   late TextEditingController _sectionController;
+  late TextEditingController _roomNumberController;
+  late TextEditingController _academicYearController;
+  late TextEditingController _maxCapacityController;
+  late TextEditingController _descriptionController;
 
   // Selected values
   SelectableTeacher? _selectedTeacher;
   List<Subject> _selectedSubjects = [];
+  bool _isActive = true;
 
   bool get isEditMode => widget.classData != null;
   bool _isLoading = false;
@@ -44,22 +47,41 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // ✅ Initialize ALL controllers with existing data in edit mode
     _classNumberController = TextEditingController(
       text: widget.classData?.classNumber.toString() ?? '',
     );
     _sectionController = TextEditingController(
       text: widget.classData?.section ?? '',
     );
-
-    // if (isEditMode && widget.classData != null) {
-    //   _selectedSubjects = widget.classData!.classSubjectsId;
-    // }
+    _roomNumberController = TextEditingController(
+      text: widget.classData?.roomNumber ?? '',
+    );
+    _academicYearController = TextEditingController(
+      text: widget.classData?.academicYear.toString() ?? DateTime.now().year.toString(),
+    );
+    _maxCapacityController = TextEditingController(
+      text: widget.classData?.maxCapacity.toString() ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.classData?.description ?? '',
+    );
+    
+    // Set active status
+    if (widget.classData != null) {
+      _isActive = widget.classData!.isActive == 1;
+    }
   }
 
   @override
   void dispose() {
     _classNumberController.dispose();
     _sectionController.dispose();
+    _roomNumberController.dispose();
+    _academicYearController.dispose();
+    _maxCapacityController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -96,8 +118,19 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
   Future<void> _handleUpdate(ClassesProvider provider) async {
     final success = await provider.editClass(
       classId: widget.classData!.id,
-      section: _sectionController.text.trim(),
+      section: _sectionController.text.trim().isNotEmpty 
+          ? _sectionController.text.trim() 
+          : null,
       classTeacherId: _selectedTeacher?.id,
+      roomNumber: _roomNumberController.text.trim().isNotEmpty 
+          ? _roomNumberController.text.trim() 
+          : null,
+      academicYear: int.tryParse(_academicYearController.text.trim()),
+      maxCapacity: int.tryParse(_maxCapacityController.text.trim()),
+      description: _descriptionController.text.trim().isNotEmpty 
+          ? _descriptionController.text.trim() 
+          : null,
+      isActive: _isActive ? 1 : 0,
       context: context,
     );
 
@@ -223,9 +256,14 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
   void _clearForm() {
     _classNumberController.clear();
     _sectionController.clear();
+    _roomNumberController.clear();
+    _academicYearController.clear();
+    _maxCapacityController.clear();
+    _descriptionController.clear();
     setState(() {
       _selectedTeacher = null;
       _selectedSubjects = [];
+      _isActive = true;
     });
   }
 
@@ -271,7 +309,7 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
             fetchData: (page, search) async {
               await provider.fetchSubjects(context: context);
               final subjects = provider.getListOfSubjects ?? [];
-         final response = await provider.fetchTeachersForSelection(
+              final response = await provider.fetchTeachersForSelection(
                 page: page,
                 search: search,
               );
@@ -281,8 +319,7 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
           ),
           child: GenericSelectorScreen<SelectableSubject>(
             title: 'Select Subjects',
-        preSelectedIds: _selectedSubjects.map((s) => s.id).toList(),
-
+            preSelectedIds: _selectedSubjects.map((s) => s.id).toList(),
           ),
         ),
       ),
@@ -321,9 +358,9 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
               24.kH,
               _buildClassInfoCard(),
               24.kH,
-              if (!isEditMode) ...[
-                _buildTeacherCard(),
-                24.kH,
+              _buildTeacherCard(),  // ✅ Show in both modes
+              24.kH,
+              if (!isEditMode) ...[  // Only in create mode
                 _buildSubjectsCard(),
                 24.kH,
               ],
@@ -434,7 +471,9 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
             ],
           ),
           20.kH,
-          if (!isEditMode)
+          
+          // ✅ Class Number (only in create mode)
+          if (!isEditMode) ...[
             TextFormField(
               controller: _classNumberController,
               keyboardType: TextInputType.number,
@@ -453,7 +492,10 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
                 return null;
               },
             ),
-          if (!isEditMode) 16.kH,
+            16.kH,
+          ],
+          
+          // ✅ Section
           TextFormField(
             controller: _sectionController,
             textCapitalization: TextCapitalization.characters,
@@ -469,6 +511,93 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
               return null;
             },
           ),
+          16.kH,
+          
+          // ✅ Room Number
+          TextFormField(
+            controller: _roomNumberController,
+            decoration: _inputDecoration(
+              'Room Number',
+              LucideIcons.doorClosed,
+              'e.g., 101',
+            ),
+          ),
+          16.kH,
+          
+          // ✅ Academic Year
+          TextFormField(
+            controller: _academicYearController,
+            keyboardType: TextInputType.number,
+            decoration: _inputDecoration(
+              'Academic Year',
+              LucideIcons.calendar,
+              'e.g., 2024',
+            ),
+            validator: (value) {
+              if (value != null && value.isNotEmpty && int.tryParse(value) == null) {
+                return 'Must be a valid year';
+              }
+              return null;
+            },
+          ),
+          16.kH,
+          
+          // ✅ Max Capacity
+          TextFormField(
+            controller: _maxCapacityController,
+            keyboardType: TextInputType.number,
+            decoration: _inputDecoration(
+              'Max Capacity',
+              LucideIcons.users,
+              'e.g., 40',
+            ),
+            validator: (value) {
+              if (value != null && value.isNotEmpty && int.tryParse(value) == null) {
+                return 'Must be a number';
+              }
+              return null;
+            },
+          ),
+          16.kH,
+          
+          // ✅ Description
+          TextFormField(
+            controller: _descriptionController,
+            maxLines: 3,
+            decoration: _inputDecoration(
+              'Description',
+              LucideIcons.alignLeft,
+              'Enter class description',
+            ),
+          ),
+          
+          // ✅ Active Status (only in edit mode)
+          if (isEditMode) ...[
+            20.kH,
+            SwitchListTile(
+              title: const Text(
+                'Active Status',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+              subtitle: Text(
+                _isActive ? 'Class is active' : 'Class is inactive',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+              value: _isActive,
+              activeColor: primaryColor,
+              onChanged: (value) {
+                setState(() {
+                  _isActive = value;
+                });
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -506,10 +635,10 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
                 ),
               ),
               12.kW,
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Class Teacher *',
-                  style: TextStyle(
+                  isEditMode ? 'Change Class Teacher' : 'Class Teacher *',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: primaryColor,
@@ -520,7 +649,9 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
           ),
           12.kH,
           Text(
-            'Select the teacher who will be in charge of this class',
+            isEditMode 
+                ? 'Select a new teacher to replace the current class teacher'
+                : 'Select the teacher who will be in charge of this class',
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey[600],
@@ -531,7 +662,7 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
             OutlinedButton.icon(
               onPressed: _showTeacherSelector,
               icon: const Icon(LucideIcons.plus, size: 20),
-              label: const Text('Select Teacher'),
+              label: Text(isEditMode ? 'Change Teacher' : 'Select Teacher'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: primaryColor,
                 side: BorderSide(color: primaryColor.withOpacity(0.5)),
@@ -584,7 +715,7 @@ class _ClassEditScreenState extends State<ClassEditScreen> {
                         ),
                         4.kH,
                         Text(
-                        "  _selectedTeacher!.email",
+                          "Teacher ID: ${_selectedTeacher!.id}",
                           style: TextStyle(
                             fontSize: 13,
                             color: AppTheme.lightGrey,

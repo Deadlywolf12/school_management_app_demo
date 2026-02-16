@@ -41,6 +41,7 @@ class FeeProvider extends ChangeNotifier {
   FeeDashboardStats? get dashboardStats => _dashboardStats;
   Payment? get selectedPayment => _selectedPayment;
 
+  // ==================== FEE STRUCTURES ====================
   
   Future<String> fetchFeeStructures({
     required BuildContext context,
@@ -57,12 +58,17 @@ class FeeProvider extends ChangeNotifier {
       final prefs = await SharedPrefHelper.getInstance();
       final token = prefs.getToken();
 
-     
       final response = await getFunction(
         '${Api().base}payments/fees/structures',
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -122,6 +128,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -173,6 +185,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -210,6 +228,12 @@ class FeeProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -257,6 +281,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -282,7 +312,7 @@ class FeeProvider extends ChangeNotifier {
   /// Apply discount to invoice
   Future<String> applyDiscount({
     required String invoiceId,
-    required String discountType, // 'percentage' or 'flat'
+    required String discountType,
     required double value,
     required String reason,
     String? notes,
@@ -312,6 +342,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -335,7 +371,7 @@ class FeeProvider extends ChangeNotifier {
   /// Apply fine to invoice
   Future<String> applyFine({
     required String invoiceId,
-    required String fineType, // 'late_fee', 'penalty', 'other'
+    required String fineType,
     required double amount,
     required String reason,
     String? notes,
@@ -365,6 +401,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -391,7 +433,7 @@ class FeeProvider extends ChangeNotifier {
   Future<String> recordPayment({
     required String invoiceId,
     required double amount,
-    required String paymentMethod, // 'cash', 'card', 'bank_transfer', 'cheque', 'online'
+    required String paymentMethod,
     String? referenceNumber,
     String? notes,
     required BuildContext context,
@@ -419,6 +461,12 @@ class FeeProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -478,6 +526,12 @@ class FeeProvider extends ChangeNotifier {
         tokenKey: token,
       );
 
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
+
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
       }
@@ -517,6 +571,12 @@ class FeeProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -565,6 +625,12 @@ class FeeProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -620,6 +686,12 @@ class FeeProvider extends ChangeNotifier {
         authorization: true,
         tokenKey: token,
       );
+
+      // ✅ NULL CHECK
+      if (response == null) {
+        _handleError({'message': 'No response from server'});
+        return 'No response from server';
+      }
 
       if (_isTokenExpired(response, context)) {
         return errorMessage ?? "Session Expired";
@@ -729,11 +801,14 @@ class FeeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _isSuccessResponse(Map<String, dynamic> response) {
+  bool _isSuccessResponse(Map<String, dynamic>? response) {
+    if (response == null) return false;  // ✅ NULL CHECK
     return response['success'] == true;
   }
 
-  bool _isTokenExpired(Map<String, dynamic> response, BuildContext context) {
+  bool _isTokenExpired(Map<String, dynamic>? response, BuildContext context) {
+    if (response == null) return false;  // ✅ NULL CHECK
+    
     if (response['msg'] == 'User not found' ||
         response['msg'] == 'Token Expired' ||
         response['msg'] == 'Invalid token') {
@@ -752,7 +827,14 @@ class FeeProvider extends ChangeNotifier {
     return false;
   }
 
-  void _handleError(Map<String, dynamic> response) {
+  void _handleError(Map<String, dynamic>? response) {
+    if (response == null) {  // ✅ NULL CHECK
+      _errorMessage = 'No response from server';
+      _status = FeeStatus.error;
+      notifyListeners();
+      return;
+    }
+    
     final errors = response['errors'] as List<dynamic>?;
     _errorMessage = errors != null && errors.isNotEmpty
         ? errors.join('\n')

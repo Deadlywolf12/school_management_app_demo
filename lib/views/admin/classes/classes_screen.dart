@@ -230,7 +230,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              Go.named(context, MyRouter.classEditCreate);
+              Go.named(context, MyRouter.classEditCreate,extra: null);
             },
             backgroundColor: AppTheme.primaryColor,
             child: const Icon(LucideIcons.plus),

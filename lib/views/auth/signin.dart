@@ -26,14 +26,14 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isPasswordVisible = false;
   bool _isChecked = false;
   bool _isDialogShowing = false;
-
+ AuthProvider? _authProvider;
   @override
   void initState() {
     super.initState();
     // Listen to auth provider changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      auth.addListener(_authListener);
+       _authProvider = Provider.of<AuthProvider>(context, listen: false);
+      _authProvider?.addListener(_authListener);
     });
   }
 
@@ -183,7 +183,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                         SnackBarHelper.showError("Login failed");
                                         } else if (auth.status ==
                                             AuthStatus.loaded) {
-                                          context.go('/home', extra: auth.role);
+                                         Go.named(context, MyRouter.home, extra: auth.role);
                                         }
                                       } catch (e) {
                                         // Handle any errors

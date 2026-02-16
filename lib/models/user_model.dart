@@ -1,19 +1,25 @@
 class AuthResponse {
   final bool success;
   final User user;
+  final String name;
   final String token;
+  final String? classId;
 
   AuthResponse({
     required this.success,
     required this.user,
     required this.token,
+    required this.name,
+    this.classId,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
       success: json['success'] ?? false,
       user: User.fromJson(json['user']),
-      token: json['token']??""
+      token: json['token']??"",
+      name: json['name']??"",
+      classId: json['classId'] ?? '',
     );
   }
 
@@ -22,6 +28,8 @@ class AuthResponse {
       'success': success,
       'user': user.toJson(),
       'token':token,
+      'name': name,
+      'classId': classId,
     };
   }
 }

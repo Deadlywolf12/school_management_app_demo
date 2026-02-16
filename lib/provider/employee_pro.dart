@@ -30,7 +30,7 @@ class FacultyProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String get currentRole => _currentRole;
   
-  // Getters - Data (Fixed: Don't create new lists on every access)
+  // Getters - Data
   List<EmpUser> get facultyList => _facultyList;
   List<Teacher> get teachers => _facultyList.whereType<Teacher>().toList();
   List<Staff> get staff => _facultyList.whereType<Staff>().toList();
@@ -49,44 +49,42 @@ class FacultyProvider extends ChangeNotifier {
   bool get isEmpty => _facultyList.isEmpty && isLoaded;
   
   /// Fetch faculty by role with pagination
-  Future<void> fetchFaculty(
-    {
+  Future<void> fetchFaculty({
     required String role,
     required BuildContext context,
     int page = 1,
-    int limit = 10,
+    int limit = 20, // ✅ Increased to 20 for better UX
     bool loadMore = false,
-    
-   
   }) async {
     try {
       // Set loading state
       _setLoadingState(loadMore);
       _currentRole = role;
       
-
       final prefs = await SharedPrefHelper.getInstance();
       final token = prefs.getToken();
+      
       // Make API call
       final response = await getFunction(
-        Api.admin.getUsers(role:role, page: page, limit: limit),
+        Api.admin.getUsers(role: role, page: page, limit: limit),
         authorization: true,
         tokenKey: token,
       );
 
-        if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
+      if (response['msg'] == 'User not found' || 
+          response['msg'] == 'Token Expired' || 
+          response['msg'] == 'Invalid token') {
         _facultyList = [];
         _status = FacultyStatus.loaded;
         _errorMessage = 'session expired';
         notifyListeners();
-         WidgetsBinding.instance.addPostFrameCallback((_) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, 
-      builder: (_) => const TokenExpiredDialoge(),
-    );
-  });
-
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            barrierDismissible: false, 
+            builder: (_) => const TokenExpiredDialoge(),
+          );
+        });
         return;
       }
       
@@ -95,8 +93,6 @@ class FacultyProvider extends ChangeNotifier {
         _handleError(response);
         return;
       }
-
-    
       
       // Parse response
       final facultyResponse = FacultyResponse.fromJson(response);
@@ -122,7 +118,7 @@ class FacultyProvider extends ChangeNotifier {
       role: _currentRole,
       page: _currentPage + 1,
       loadMore: true,
-      context: context
+      context: context,
     );
   }
   
@@ -136,71 +132,7 @@ class FacultyProvider extends ChangeNotifier {
     );
   }
   
-  /// Get single user details by ID
-  // Future<EmpUser?> getUserDetails(String userId) async {
-  //   try {
-  //     final response = await getFunction(
-  //       Api.admin.getUserDetails(userId),
-  //     );
-      
-  //     if (response['success'] != true) return null;
-      
-  //     final data = response['data'] as Map<String, dynamic>?;
-  //     if (data == null) return null;
-      
-  //     // Create model based on role
-  //     return _createUserModel(data);
-      
-  //   } catch (e) {
-  //     _errorMessage = getFriendlyErrorMessage(e);
-  //     notifyListeners();
-  //     return null;
-  //   }
-  // }
-  
-  /// Delete user by ID
-  // Future<bool> deleteUser(String userId,BuildContext context) async {
-  //   try {
-  //     final response = await deleteFunction(
-  //      api: '', body: {},
-  //     );
-      
-  //     if (response['success'] == true) {
-  //       // Remove from local list
-  //       _facultyList.removeWhere((user) => user.id == userId);
-  //       _totalCount = _totalCount > 0 ? _totalCount - 1 : 0;
-  //       notifyListeners();
-  //       return true;
-  //     }
-
-  //       if(response['msg'] == 'User not found' || response['msg'] == 'Token Expired' || response['msg'] == 'Invalid token'){
-  //       _facultyList = [];
-  //       _status = FacultyStatus.loaded;
-  //       _errorMessage = 'session expired';
-  //       notifyListeners();
-  //        WidgetsBinding.instance.addPostFrameCallback((_) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false, 
-  //     builder: (_) => const TokenExpiredDialoge(),
-  //   );
-  // });
-
-  //       return false;
-  //     }
-      
-  //     _errorMessage = response['message'] ?? 'Failed to delete user';
-  //     notifyListeners();
-  //     return false;
-      
-  //   } catch (e) {
-  //     _errorMessage = getFriendlyErrorMessage(e);
-  //     notifyListeners();
-  //     return false;
-  //   }
-  // }
-  
-  /// Search users by query (Fixed: Return immutable list)
+  /// Search users by query
   List<EmpUser> search(String query) {
     if (query.isEmpty) return List.from(_facultyList);
     
@@ -233,7 +165,7 @@ class FacultyProvider extends ChangeNotifier {
     }).toList();
   }
   
-  /// Filter by department (Fixed: Return new list)
+  /// Filter by department
   List<EmpUser> filterByDepartment(String department) {
     if (department == 'All Departments') return List.from(_facultyList);
     
@@ -262,14 +194,14 @@ class FacultyProvider extends ChangeNotifier {
     }).toList();
   }
   
-  /// Sort by name (Fixed: Don't mutate input list)
+  /// Sort by name
   List<EmpUser> sortByName(List<EmpUser> list) {
     final sorted = List<EmpUser>.from(list);
     sorted.sort((a, b) => a.name.compareTo(b.name));
     return sorted;
   }
   
-  /// Sort by department (Fixed: Don't mutate input list)
+  /// Sort by department
   List<EmpUser> sortByDepartment(List<EmpUser> list) {
     final sorted = List<EmpUser>.from(list);
     sorted.sort((a, b) {
@@ -332,9 +264,10 @@ class FacultyProvider extends ChangeNotifier {
   void _setLoadingState(bool loadMore) {
     if (loadMore) {
       _status = FacultyStatus.loadingMore;
+      // ✅ DON'T reset list when loading more pages
     } else {
       _status = FacultyStatus.loading;
-      _facultyList = [];
+      _facultyList = []; // ✅ Only reset on fresh fetch
       _currentPage = 1;
     }
     notifyListeners();
@@ -360,36 +293,19 @@ class FacultyProvider extends ChangeNotifier {
   }
   
   void _updateData(FacultyResponse response, bool loadMore) {
-    // Update pagination
+    // Update pagination info
     _currentPage = response.page;
     _totalPages = response.totalPages ?? 1;
     _totalCount = response.totalCount ?? response.data.length;
     _hasMore = _currentPage < _totalPages;
     
-    // Update list
+    // ✅ Update list - append if loading more, replace if fresh fetch
     if (loadMore) {
       _facultyList.addAll(response.data);
     } else {
       _facultyList = response.data;
     }
   }
-  
-  // EmpUser _createUserModel(Map<String, dynamic> data) {
-  //   final role = data['role'] ?? _currentRole;
-    
-  //   switch (role) {
-  //     case 'teacher':
-  //       return Teacher.fromJson(data);
-  //     case 'staff':
-  //       return Staff.fromJson(data);
-  //     case 'student':
-  //       return Student.fromJson(data);
-  //     case 'parent':
-  //       return Parent.fromJson(data);
-  //     default:
-  //       return EmpUser.fromJson(data);
-  //   }
-  // }
   
   String _getDepartment(EmpUser user) {
     if (user is Teacher) return user.department;

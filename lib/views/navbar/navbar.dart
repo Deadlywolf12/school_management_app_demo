@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:school_management_demo/models/exam_model.dart';
 import 'package:school_management_demo/theme/colors.dart';
 import 'package:school_management_demo/views/admin/employees/employees_list.dart';
 import 'package:school_management_demo/views/admin/home/admin_dashboard.dart';
 import 'package:school_management_demo/views/admin/manage_opt_screen.dart';
+import 'package:school_management_demo/views/attendence/attandance_dashboard.dart';
+import 'package:school_management_demo/views/attendence/my_attendence.dart';
+import 'package:school_management_demo/views/student/fees/student_exam_screen.dart';
+import 'package:school_management_demo/views/student/fees/student_fee_screen.dart';
+import 'package:school_management_demo/views/student/fees/student_schedule_screen.dart';
 
 // Import your dashboards and settings
 
-import 'package:school_management_demo/views/home/student_dashboard.dart';
+import 'package:school_management_demo/views/student/student_dashboard.dart';
 import 'package:school_management_demo/views/home/teachers_dashboard.dart';
 import 'package:school_management_demo/views/home/staff_dashboard.dart';
 import 'package:school_management_demo/views/settings/settings.dart';
+import 'package:school_management_demo/views/teacher/my_salary.dart';
 
 class NavigationHandler extends StatefulWidget {
   final String userRole; // "admin", "teacher", "student", "staff"
@@ -44,33 +51,37 @@ class _NavigationHandlerState extends State<NavigationHandler> {
         return  [
           AdminHomeScreen(),
           ManagementOptionsScreen(), 
-          FacultyDirectoryScreen(), 
+        FacultyDirectoryScreen(),
     
           SettingsScreen(),
         ];
       case "teacher":
         return  [
           TeacherHomeScreen(),
-          TeacherHomeScreen(), // Analytics
-          TeacherHomeScreen(), // Add
+         ManagementOptionsScreen(), // Analytics
+         AttendanceDashboard(), // Add
+         EmployeeSalaryScreen(),
           SettingsScreen(),
         ];
       case "student":
         return const [
           StudentHomeScreen(),
-          StudentHomeScreen(), // Analytics
+          StudentScheduleScreen(),
+          MyAttendanceScreen(), 
+          // StudentFeeScreen(),
+          StudentExamScreen(),
           SettingsScreen(),
         ];
       case "staff":
         return  [
           StaffHomeScreen(),
-          StaffHomeScreen(), // Analytics
+       
           SettingsScreen(),
         ];
       default:
         return  [
           StudentHomeScreen(),
-          StudentHomeScreen(),
+      
           SettingsScreen(),
         ];
     }
@@ -90,14 +101,17 @@ class _NavigationHandlerState extends State<NavigationHandler> {
       case "teacher":
         return const [
           _NavItem(LucideIcons.home, "Home"),
-          _NavItem(LucideIcons.barChart2, "Analytics"),
-          _NavItem(LucideIcons.plus, "Add"),
+          _NavItem(LucideIcons.option, "Manage"),
+          _NavItem(LucideIcons.calendar, "Attendance"),
+          _NavItem(LucideIcons.currency, "Salary"),
           _NavItem(LucideIcons.settings2, "Settings"),
         ];
       case "student":
         return const [
           _NavItem(LucideIcons.home, "Home"),
-          _NavItem(LucideIcons.bookOpen, "schedule"),
+          _NavItem(LucideIcons.bookOpen, "Schedule"),
+          _NavItem(LucideIcons.calendar, "Attendance"),
+          _NavItem(LucideIcons.file, "Exams"),
           _NavItem(LucideIcons.settings2, "Settings"),
         ];
       case "staff":
