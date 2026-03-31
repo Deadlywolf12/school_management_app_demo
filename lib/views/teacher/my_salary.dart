@@ -111,10 +111,7 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen>
     if (_hasInvalidRole) {
       return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
+      
           title: const Text('My Salary'),
           centerTitle: true,
         ),
@@ -187,7 +184,7 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+   
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

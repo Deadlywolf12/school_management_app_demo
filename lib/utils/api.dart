@@ -1,7 +1,8 @@
 // api.dart - Complete API endpoints for School Management System
 
 class Api {
-  String base = "http://192.168.0.107:8000/api/v1/";
+  String base = "http://192.168.0.106/api/v1/";
+
  
   // String base = "https://your-domain.com/api/v1/";
   
