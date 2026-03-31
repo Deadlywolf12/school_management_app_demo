@@ -183,4 +183,4 @@ The app supports **5 distinct user roles** with specialized dashboards and featu
 - **FL Chart** (^0.68.0) - Beautiful charts and graphs
 - **Table Calendar** (^3.2.0) - Interactive calendar widget
 
-## 📁 Project Structure
+
